@@ -16,7 +16,7 @@ export class AuthService {
     return null;
   }
 
-  async getToken(user: any) {
+  async getToken(user) {
     const payload = { email: user.email, sub: user.id };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { pass, ...result } = user;
