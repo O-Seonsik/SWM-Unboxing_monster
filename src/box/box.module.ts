@@ -6,6 +6,5 @@ import { PrismaService } from '../prisma/prisma.service';
 @Module({
   controllers: [BoxController],
   providers: [BoxService, PrismaService],
-  exports: [BoxService, PrismaService],
 })
 export class BoxModule {}
