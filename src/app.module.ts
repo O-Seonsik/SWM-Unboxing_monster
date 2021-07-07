@@ -5,9 +5,10 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { BoxModule } from './box/box.module';
 import { ItemModule } from './item/item.module';
+import { BoxitemModule } from './boxitem/boxitem.module';
 
 @Module({
-  imports: [UsersModule, AuthModule, BoxModule, ItemModule],
+  imports: [UsersModule, AuthModule, BoxModule, ItemModule, BoxitemModule],
   controllers: [AppController],
   providers: [AppService],
 })
