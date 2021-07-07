@@ -17,4 +17,40 @@ model USER {
     pass        String
     phone       String  @unique
     point       Int     @default(0)
+    box         Box[]
+    cart        Cart[]
 }
+
+model Box {
+    id      Int     @default(autoincrement()) @id
+    title   String
+    price   Int
+    owner   USER    @relation(fields: [ownerId], references: [id])
+    ownerId Int
+    boxItem BoxItem[]
+}
+
+model Item {
+    id      Int     @default(autoincrement()) @id
+    title   String
+    price   Int
+    image   String
+    detail  String
+    boxItem BoxItem[]
+}
+
+model Cart {
+    id      Int     @default(autoincrement()) @id
+    box_id  Int
+    user    USER    @relation(fields: [userId], references: [id])
+    userId  Int
+}
+
+model BoxItem {
+    id      Int     @default(autoincrement()) @id
+    box     Box     @relation(fields: [boxId], references: [id])
+    boxId   Int
+    item    Item    @relation(fields: [itemId], references: [id])
+    itemId  Int
+}
+
