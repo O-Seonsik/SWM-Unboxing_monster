@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { BoxitemService } from './boxitem.service';
-import { BoxitemController } from './boxitem.controller';
+import { BoxItemService } from './boxitem.service';
+import { BoxItemController } from './boxitem.controller';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
-  controllers: [BoxitemController],
-  providers: [BoxitemService, PrismaService],
+  controllers: [BoxItemController],
+  providers: [BoxItemService, PrismaService],
 })
 export class BoxitemModule {}
