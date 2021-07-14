@@ -40,4 +40,12 @@ export class UsersService {
         throw new ForbiddenException(e.code, e.meta.target);
     }
   }
+
+  async deleteUser(
+    userWhereUniqueInput: Prisma.USERWhereUniqueInput,
+  ): Promise<USER> {
+    return this.prisma.uSER.delete({
+      where: userWhereUniqueInput,
+    });
+  }
 }
