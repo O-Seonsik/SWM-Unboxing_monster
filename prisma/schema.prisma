@@ -10,12 +10,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model USER {
-    id          Int     @default(autoincrement()) @id
-    nickname    String  @unique
+model User {
+    id          String  @id
     email       String  @unique
-    pass        String
-    phone       String  @unique
     point       Int     @default(0)
     box         Box[]
     cart        Cart[]
@@ -25,8 +22,8 @@ model Box {
     id      Int     @default(autoincrement()) @id
     title   String
     price   Int
-    owner   USER    @relation(fields: [ownerId], references: [id])
-    ownerId Int
+    owner   User    @relation(fields: [ownerId], references: [id])
+    ownerId String
     boxItem BoxItem[]
 }
 
@@ -42,8 +39,8 @@ model Item {
 model Cart {
     id      Int     @default(autoincrement()) @id
     box_id  Int
-    user    USER    @relation(fields: [userId], references: [id])
-    userId  Int
+    user    User    @relation(fields: [userId], references: [id])
+    userId  String
 }
 
 model BoxItem {
@@ -54,3 +51,12 @@ model BoxItem {
     itemId  Int
 }
 
+model Purchars{
+    id              Int         @default(autoincrement())   @id
+    boxId           Int
+    count           Int
+    puarchaseAt     DateTime    @default(now())
+    price           Int
+    refund          Boolean
+    refundAt        DateTime
+}

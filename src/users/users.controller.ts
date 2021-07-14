@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,7 +29,10 @@ export class UsersController {
   }
 
   @Patch(':id')
-  async updateUser(@Body() body: UpdateUserDto, @Param('id') id: number): Promise<UsersEntity> {
+  async updateUser(
+    @Body() body: UpdateUserDto,
+    @Param('id') id: number,
+  ): Promise<UsersEntity> {
     return this.usersService.updateUser({
       where: { id: Number(id) },
       data: {
@@ -32,5 +43,12 @@ export class UsersController {
         point: body.point,
       },
     });
+  }
+
+  // delete의 cascade 때무네 뭐가 안됨 ;;
+  @Delete(':id')
+  async deleteUser(@Param('id') id: number) {
+    console.log(id);
+    return this.usersService.deleteUser({ id: id });
   }
 }

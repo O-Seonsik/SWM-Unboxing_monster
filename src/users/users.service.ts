@@ -4,35 +4,35 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, USER } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async getUser(
-    userWhereUniqueInput: Prisma.USERWhereUniqueInput,
-  ): Promise<USER | null> {
-    return this.prisma.uSER.findUnique({
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+  ): Promise<User | null> {
+    return this.prisma.user.findUnique({
       where: userWhereUniqueInput,
     });
   }
 
-  async createUser(data: Prisma.USERCreateInput): Promise<USER> {
+  async createUser(data: Prisma.UserCreateInput): Promise<User> {
     try {
-      return await this.prisma.uSER.create({ data });
+      return await this.prisma.user.create({ data });
     } catch (e) {
       throw new ForbiddenException(e.code, e.meta.target);
     }
   }
 
   async updateUser(params: {
-    where: Prisma.USERWhereUniqueInput;
-    data: Prisma.USERUpdateInput;
-  }): Promise<USER | any> {
+    where: Prisma.UserWhereUniqueInput;
+    data: Prisma.UserUpdateInput;
+  }): Promise<User | any> {
     const { data, where } = params;
     try {
-      return await this.prisma.uSER.update({ data, where });
+      return await this.prisma.user.update({ data, where });
     } catch (e) {
       console.log(e);
       if (e.code === 'P2025') throw new NotFoundException(e.code, e.meta.cause);
@@ -42,9 +42,9 @@ export class UsersService {
   }
 
   async deleteUser(
-    userWhereUniqueInput: Prisma.USERWhereUniqueInput,
-  ): Promise<USER> {
-    return this.prisma.uSER.delete({
+    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
+  ): Promise<User> {
+    return this.prisma.user.delete({
       where: userWhereUniqueInput,
     });
   }
