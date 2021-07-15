@@ -1,24 +1,23 @@
-import { IsEmail, IsPhoneNumber, IsString } from 'class-validator';
+import { IsEmail, IsEnum, IsString } from 'class-validator';
 
 export class CreateUserDto {
   /**
-   * nickname
-   * @example prince
+   * User's token it doesn't have bearer
+   * @example "asd132fd2j3l3df3aslk234asdf"
    */
   @IsString()
-  readonly nickname: string;
+  readonly token: string;
   /**
-   * email address like example
-   * @example test@mail.com
+   * User's email
+   * @example "email@mail.com"
    */
   @IsEmail()
   readonly email: string;
-  @IsString()
-  readonly pass: string;
   /**
-   * the phone number has hyphen(-)
-   * @example 010-1234-5678
+   * User's social
+   * @example "kakao | facebook | apple"
    */
-  @IsPhoneNumber('KR')
-  readonly phone: string;
+  // @IsString()
+  @IsEnum(['kakao', 'facebook', 'apple'])
+  readonly co: string;
 }

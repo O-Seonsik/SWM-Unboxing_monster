@@ -1,28 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { JwtService } from '@nestjs/jwt';
-import { USER } from '@prisma/client';
+import { User } from '@prisma/client';
+import { type } from 'os';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-  ) {}
+  constructor(private usersService: UsersService) {}
 
-  async validateUser(email: string, pass: string): Promise<USER> {
-    const user = await this.usersService.getUser({ email: email });
-    if (user && user.pass === pass) return user;
-    return null;
-  }
-
-  async getToken(user) {
-    const payload = { email: user.email, sub: user.id };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { pass, ...result } = user;
-    return {
-      access_token: this.jwtService.sign(payload),
-      ...result,
-    };
+  async validateUser(token: string, co: string): Promise<User> {
+    const userId = await this.usersService.getUserSocialId(token, co);
+    if (typeof userId != 'string') throw userId;
+    const user = await this.usersService.getUser({ id: userId });
+    if (!user) return null;
+    return user;
   }
 }

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,27 +18,38 @@ import { UsersEntity } from './entities/users.entity';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get(':id')
+  async getUser(@Param('id') id: string): Promise<UsersEntity> {
+    return this.usersService.getUser({ id: id });
+  }
+
+  @Get()
+  async getUsers(): Promise<UsersEntity[]> {
+    return this.usersService.getUsers();
+  }
+
   @Post()
   async createUser(@Body() user: CreateUserDto): Promise<UsersEntity> {
     return this.usersService.createUser(user);
   }
 
-  @Get(':id')
-  async getUser(@Param('id') id: number): Promise<UsersEntity> {
-    return this.usersService.getUser({ id: id });
-  }
-
   @Patch(':id')
-  async updateUser(@Body() body: UpdateUserDto, @Param('id') id: number): Promise<UsersEntity> {
+  async updateUser(
+    @Body() body: UpdateUserDto,
+    @Param('id') id: string,
+  ): Promise<UsersEntity> {
     return this.usersService.updateUser({
-      where: { id: Number(id) },
+      where: { id: id },
       data: {
-        nickname: body.nickname,
         email: body.email,
-        pass: body.pass,
-        phone: body.phone,
         point: body.point,
       },
     });
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    console.log(id);
+    return this.usersService.deleteUser({ id: id });
   }
 }
