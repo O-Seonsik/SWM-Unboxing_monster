@@ -18,36 +18,37 @@ import { UsersEntity } from './entities/users.entity';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get(':id')
+  async getUser(@Param('id') id: string): Promise<UsersEntity> {
+    return this.usersService.getUser({ id: id });
+  }
+
+  @Get()
+  async getUsers(): Promise<UsersEntity[]> {
+    return this.usersService.getUsers();
+  }
+
   @Post()
   async createUser(@Body() user: CreateUserDto): Promise<UsersEntity> {
     return this.usersService.createUser(user);
   }
 
-  @Get(':id')
-  async getUser(@Param('id') id: number): Promise<UsersEntity> {
-    return this.usersService.getUser({ id: id });
-  }
-
   @Patch(':id')
   async updateUser(
     @Body() body: UpdateUserDto,
-    @Param('id') id: number,
+    @Param('id') id: string,
   ): Promise<UsersEntity> {
     return this.usersService.updateUser({
-      where: { id: Number(id) },
+      where: { id: id },
       data: {
-        nickname: body.nickname,
         email: body.email,
-        pass: body.pass,
-        phone: body.phone,
         point: body.point,
       },
     });
   }
 
-  // delete의 cascade 때무네 뭐가 안됨 ;;
   @Delete(':id')
-  async deleteUser(@Param('id') id: number) {
+  async deleteUser(@Param('id') id: string) {
     console.log(id);
     return this.usersService.deleteUser({ id: id });
   }
