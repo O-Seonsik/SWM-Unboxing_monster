@@ -7,8 +7,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UsersEntity } from './entities/users.entity';
+import { getWebAccessToken } from '../auth/constants';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fetch = require('node-fetch');
 
@@ -28,25 +27,41 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
-  async getUserSocialId(token, co) {
-    let url: string;
-    if (co === 'kakao')
-      url = 'https://kapi.kakao.com/v1/user/access_token_info';
-    else if (co === 'facebook') url = 'fb';
-    else if (co === 'apple') url = 'apple';
-    return await fetch(url, {
+  async getKakaoId(token: string) {
+    return await fetch('https://kapi.kakao.com/v1/user/access_token_info', {
       headers: { Authorization: 'Bearer ' + token },
     })
       .then((res) => res.json())
       .then((data) => {
-        if (data.id) return co[0] + data.id;
+        if (data.id) return 'k' + data.id;
         else if (data.code == -401)
           throw new UnauthorizedException('this access token does not exist.');
         else if (data.code == -2)
           throw new UnauthorizedException('too long for access token.');
       })
       .catch((err) => err);
-    // 카카오 핸들링 완료
+  }
+
+  async getFacebookId(token: string) {
+    return await fetch(
+      'https://graph.facebook.com/debug_token?' +
+        'input_token=' +
+        token +
+        '&access_token=' +
+        (await getWebAccessToken()),
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const res = data.data;
+        if (res.user_id) return 'f' + data.data.user_id;
+        else throw new UnauthorizedException(res.error.message);
+      })
+      .catch((err) => err);
+  }
+
+  async getUserSocialId(token, co) {
+    if (co === 'kakao') return this.getKakaoId(token);
+    else if (co === 'facebook') return this.getFacebookId(token);
   }
 
   async createUser(user: CreateUserDto) {
