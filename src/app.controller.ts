@@ -9,7 +9,6 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard)
   @UseGuards(LocalAuthGuard)
   @Get()
   getHello(@Request() req): GetHelloEntity {
