@@ -62,6 +62,7 @@ export class UsersService {
   async getUserSocialId(token, co) {
     if (co === 'kakao') return this.getKakaoId(token);
     else if (co === 'facebook') return this.getFacebookId(token);
+    else if (co === 'apple') return 'apple';
   }
 
   async createUser(user: CreateUserDto) {
