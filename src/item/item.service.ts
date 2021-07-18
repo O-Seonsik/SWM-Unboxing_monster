@@ -9,4 +9,14 @@ export class ItemService {
   async createItem(data: Prisma.ItemCreateInput): Promise<Item> {
     return this.prisma.item.create({ data });
   }
+
+  async getItem(
+    itemWhereUniqueInput: Prisma.ItemWhereUniqueInput,
+  ): Promise<Item> {
+    return this.prisma.item.findUnique({ where: itemWhereUniqueInput });
+  }
+
+  async getItems(): Promise<Item[]> {
+    return this.prisma.item.findMany();
+  }
 }
