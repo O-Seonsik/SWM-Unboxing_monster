@@ -16,6 +16,11 @@ import { ApiTags } from '@nestjs/swagger';
 export class BoxController {
   constructor(private readonly prismaService: PrismaService) {}
 
+  @Get()
+  async getBoxes(): Promise<Box[]> {
+    return await this.prismaService.box.findMany();
+  }
+
   @Get(':id')
   async getBox(@Param('id') id: number): Promise<Box> {
     return await this.prismaService.box.findUnique({ where: { id: id } });
