@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   NotFoundException,
@@ -54,6 +55,19 @@ export class BoxController {
           ownerId: body.ownerId,
         },
       });
+    } catch (error) {
+      if (error.code === 'P2025')
+        throw new NotFoundException(error.code, error.meta.cause);
+      if (error.code === 'P2002')
+        throw new ForbiddenException(error.code, error.meta.target);
+      return error;
+    }
+  }
+
+  @Delete(':id')
+  async deleteBox(@Param('id') id: number): Promise<Box> {
+    try {
+      return await this.prismaService.box.delete({ where: { id: id } });
     } catch (error) {
       if (error.code === 'P2025')
         throw new NotFoundException(error.code, error.meta.cause);
