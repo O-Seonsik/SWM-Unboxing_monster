@@ -96,8 +96,15 @@ export class UsersService {
   async deleteUser(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
   ): Promise<User> {
-    return this.prisma.user.delete({
-      where: userWhereUniqueInput,
-    });
+    try {
+      return await this.prisma.user.delete({
+        where: userWhereUniqueInput,
+      });
+    } catch (e) {
+      if (e.code === 'P2025') throw new NotFoundException(e.code, e.meta.cause);
+      if (e.code === 'P2002')
+        throw new ForbiddenException(e.code, e.meta.target);
+      return e;
+    }
   }
 }
