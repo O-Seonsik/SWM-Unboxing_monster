@@ -12,6 +12,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Box } from '@prisma/client';
 import { CreateBoxDto } from './dto/create-box.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { UpdateBoxDto } from './dto/update-box.dto';
 
 @ApiTags('Box')
 @Controller('box')
@@ -40,7 +41,10 @@ export class BoxController {
   }
 
   @Patch(':id')
-  async updateBox(@Body() body, @Param('id') id: number): Promise<Box> {
+  async updateBox(
+    @Body() body: UpdateBoxDto,
+    @Param('id') id: number,
+  ): Promise<Box> {
     try {
       return await this.prismaService.box.update({
         where: { id: id },
