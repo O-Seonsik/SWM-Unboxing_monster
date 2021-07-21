@@ -1,17 +1,34 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { BoxService } from './box.service';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { Box } from '@prisma/client';
+import { CreateBoxDto } from './dto/create-box.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Box')
 @Controller('box')
 export class BoxController {
-  constructor(private readonly boxService: BoxService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   @Get(':id')
-  async getBox(@Param('id') id) {
-    return this.boxService.getBox({ id: +id });
+  async getBox(@Param('id') id: number): Promise<Box> {
+    return await this.prismaService.box.findUnique({ where: { id: id } });
   }
 
   @Post()
-  async createBox(@Body() box) {
-    return this.boxService.createBox(box);
+  async createBox(@Body() box: CreateBoxDto): Promise<Box> {
+    try {
+      return await this.prismaService.box.create({ data: box });
+    } catch (e) {
+      if (e.code === 'P2003')
+        throw new NotFoundException("The ownerId doesn't exist in our service");
+      return e;
+    }
   }
 }
