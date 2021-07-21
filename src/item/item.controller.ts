@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { ItemService } from './item.service';
 
 @Controller('item')
@@ -18,5 +18,15 @@ export class ItemController {
   @Post()
   async createItem(@Body() box) {
     return this.itemService.createItem(box);
+  }
+
+  @Patch(':id')
+  async updateItem() {
+
+  }
+
+  @Delete(':id')
+  async deleteItem() {
+
   }
 }
