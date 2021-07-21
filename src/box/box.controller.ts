@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   NotFoundException,
   Param,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -34,6 +36,26 @@ export class BoxController {
       if (e.code === 'P2003')
         throw new NotFoundException("The ownerId doesn't exist in our service");
       return e;
+    }
+  }
+
+  @Patch(':id')
+  async updateBox(@Body() body, @Param('id') id: number): Promise<Box> {
+    try {
+      return await this.prismaService.box.update({
+        where: { id: id },
+        data: {
+          title: body.title,
+          price: body.price,
+          ownerId: body.ownerId,
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2025')
+        throw new NotFoundException(error.code, error.meta.cause);
+      if (error.code === 'P2002')
+        throw new ForbiddenException(error.code, error.meta.target);
+      return error;
     }
   }
 }
