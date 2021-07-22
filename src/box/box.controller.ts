@@ -14,6 +14,7 @@ import { Box } from '@prisma/client';
 import { CreateBoxDto } from './dto/create-box.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { UpdateBoxDto } from './dto/update-box.dto';
+import { BoxEntity } from './entities/box.entity';
 
 @ApiTags('Box')
 @Controller('box')
@@ -26,8 +27,13 @@ export class BoxController {
   }
 
   @Get(':id')
-  async getBox(@Param('id') id: number): Promise<Box> {
-    return await this.prismaService.box.findUnique({ where: { id: id } });
+  async getBox(@Param('id') id: number): Promise<BoxEntity> {
+    const box = await this.prismaService.box.findUnique({
+      where: { id: id },
+      include: { items: { include: { item: true } } },
+    });
+
+    return { ...box, items: box.items.map((item) => item.item) };
   }
 
   @Post()
