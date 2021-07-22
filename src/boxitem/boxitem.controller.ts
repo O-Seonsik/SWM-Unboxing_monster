@@ -12,7 +12,9 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBoxItemDto } from './dto/create-box-item.dto';
 import { UpdateBoxItemDto } from './dto/update-box-item.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('BoxItem')
 @Controller('boxitem')
 export class BoxItemController {
   constructor(private readonly prismaService: PrismaService) {}
