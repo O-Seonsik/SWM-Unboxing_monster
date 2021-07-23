@@ -60,3 +60,9 @@ model Purchars{
     refund          Boolean
     refundAt        DateTime
 }
+
+model Notice{
+    id      Int     @default(autoincrement())   @id
+    imgUrl  String
+    srcUrl  String
+}
