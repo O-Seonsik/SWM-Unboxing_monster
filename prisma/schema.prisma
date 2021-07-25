@@ -19,12 +19,14 @@ model User {
 }
 
 model Box {
-    id      Int     @default(autoincrement()) @id
-    title   String
-    price   Int
-    owner   User    @relation(fields: [ownerId], references: [id])
-    ownerId String
-    items   BoxItem[]
+    id          Int     @default(autoincrement()) @id
+    title       String
+    price       Int
+    owner       User    @relation(fields: [ownerId], references: [id])
+    ownerId     String
+    items       BoxItem[]
+    purchars    BoxPurchars[]
+    sales       Int
 }
 
 model Item {
@@ -51,10 +53,18 @@ model BoxItem {
     itemId  Int
 }
 
+
+model BoxPurchars{
+    id          Int         @default(autoincrement())   @id
+    box         Box         @relation(fields: [boxId], references: [id])
+    boxId       Int
+    purchars    Purchars    @relation(fields: [purcharsId], references: [id])
+    purcharsId  Int
+}
+
 model Purchars{
     id              Int         @default(autoincrement())   @id
-    boxId           Int
-    count           Int
+    boxes           BoxPurchars[]
     puarchaseAt     DateTime    @default(now())
     price           Int
     refund          Boolean
