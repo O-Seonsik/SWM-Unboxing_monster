@@ -25,8 +25,8 @@ model Box {
     owner       User    @relation(fields: [ownerId], references: [id])
     ownerId     String
     items       BoxItem[]
-    purchars    BoxPurchars[]
-    sales       Int
+    purchase    BoxPurchase[]
+    sales       Int     @default(0)
 }
 
 model Item {
@@ -54,18 +54,18 @@ model BoxItem {
 }
 
 
-model BoxPurchars{
+model BoxPurchase{
     id          Int         @default(autoincrement())   @id
     box         Box         @relation(fields: [boxId], references: [id])
     boxId       Int
-    purchars    Purchars    @relation(fields: [purcharsId], references: [id])
-    purcharsId  Int
+    purchase    Purchase    @relation(fields: [purchaseId], references: [id])
+    purchaseId  Int
 }
 
-model Purchars{
+model Purchase{
     id              Int         @default(autoincrement())   @id
-    boxes           BoxPurchars[]
-    puarchaseAt     DateTime    @default(now())
+    boxes           BoxPurchase[]
+    purchaseAt      DateTime    @default(now())
     price           Int
     refund          Boolean
     refundAt        DateTime
