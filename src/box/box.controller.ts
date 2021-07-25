@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -8,6 +9,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Box } from '@prisma/client';
@@ -24,6 +26,16 @@ export class BoxController {
   @Get()
   async getBoxes(): Promise<Box[]> {
     return await this.prismaService.box.findMany();
+  }
+
+  @Get('popular')
+  async getPopularBoxes(@Req() req): Promise<Box[]> {
+    const take = req.query.take ? parseInt(req.query.take) : 5;
+    if (!take) throw new BadRequestException('take must be a integer');
+    return await this.prismaService.box.findMany({
+      take: take,
+      orderBy: { sales: 'desc' },
+    });
   }
 
   @Get(':id')
