@@ -18,12 +18,4 @@ export class UpdateBoxDto extends PartialType(CreateBoxDto) {
   @IsOptional()
   @IsNumber()
   readonly price?: number;
-
-  /**
-   * 박스 제작자 id(key)
-   * @example 'k1804801727'
-   */
-  @IsOptional()
-  @IsString()
-  readonly ownerId?: string;
 }
