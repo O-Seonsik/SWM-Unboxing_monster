@@ -7,7 +7,6 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Box } from '@prisma/client';
 import { BoxEntity } from './entities/box.entity';
 import { CreateBoxDto } from './dto/create-box.dto';
-import { UpdateBoxDto } from './dto/update-box.dto';
 
 @Injectable()
 export class BoxService {
