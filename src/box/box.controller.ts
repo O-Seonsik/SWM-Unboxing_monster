@@ -34,7 +34,7 @@ export class BoxController {
 
   @Get(':id')
   async getBox(@Param('id') id: number): Promise<BoxEntity> {
-    return await this.boxService.getBox(id);
+    return await this.boxService.getBox({ id: id });
   }
 
   @Get('popular')

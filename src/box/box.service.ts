@@ -16,9 +16,11 @@ export class BoxService {
     return await this.prismaService.box.findMany();
   }
 
-  async getBox(id: number): Promise<BoxEntity> {
+  async getBox(
+    boxWhereUniqueInput: Prisma.BoxWhereUniqueInput,
+  ): Promise<BoxEntity> {
     const box = await this.prismaService.box.findUnique({
-      where: { id: id },
+      where: boxWhereUniqueInput,
       include: { items: { include: { item: true } } },
     });
 
