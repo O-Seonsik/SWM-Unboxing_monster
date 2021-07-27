@@ -17,46 +17,36 @@ import { CreateBoxDto } from './dto/create-box.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { UpdateBoxDto } from './dto/update-box.dto';
 import { BoxEntity } from './entities/box.entity';
+import { BoxService } from './box.service';
 
 @ApiTags('Box')
 @Controller('box')
 export class BoxController {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly boxService: BoxService,
+  ) {}
 
   @Get()
   async getBoxes(): Promise<Box[]> {
-    return await this.prismaService.box.findMany();
+    return await this.boxService.getBoxes();
+  }
+
+  @Get(':id')
+  async getBox(@Param('id') id: number): Promise<BoxEntity> {
+    return await this.boxService.getBox(id);
   }
 
   @Get('popular')
   async getPopularBoxes(@Req() req): Promise<Box[]> {
     const take = req.query.take ? parseInt(req.query.take) : 5;
     if (!take) throw new BadRequestException('take must be a integer');
-    return await this.prismaService.box.findMany({
-      take: take,
-      orderBy: { sales: 'desc' },
-    });
-  }
-
-  @Get(':id')
-  async getBox(@Param('id') id: number): Promise<BoxEntity> {
-    const box = await this.prismaService.box.findUnique({
-      where: { id: id },
-      include: { items: { include: { item: true } } },
-    });
-
-    return { ...box, items: box.items.map((item) => item.item) };
+    return await this.boxService.getPopularBoxes(take);
   }
 
   @Post()
   async createBox(@Body() box: CreateBoxDto): Promise<Box> {
-    try {
-      return await this.prismaService.box.create({ data: box });
-    } catch (e) {
-      if (e.code === 'P2003')
-        throw new NotFoundException("The ownerId doesn't exist in our service");
-      return e;
-    }
+    return await this.boxService.createBox(box);
   }
 
   @Patch(':id')
@@ -64,34 +54,17 @@ export class BoxController {
     @Body() body: UpdateBoxDto,
     @Param('id') id: number,
   ): Promise<Box> {
-    try {
-      return await this.prismaService.box.update({
-        where: { id: id },
-        data: {
-          title: body.title,
-          price: body.price,
-          ownerId: body.ownerId,
-        },
-      });
-    } catch (error) {
-      if (error.code === 'P2025')
-        throw new NotFoundException(error.code, error.meta.cause);
-      if (error.code === 'P2002')
-        throw new ForbiddenException(error.code, error.meta.target);
-      return error;
-    }
+    return await this.boxService.updateBox({
+      where: { id: id },
+      data: {
+        title: body.title,
+        price: body.price,
+      },
+    });
   }
 
   @Delete(':id')
   async deleteBox(@Param('id') id: number): Promise<Box> {
-    try {
-      return await this.prismaService.box.delete({ where: { id: id } });
-    } catch (error) {
-      if (error.code === 'P2025')
-        throw new NotFoundException(error.code, error.meta.cause);
-      if (error.code === 'P2002')
-        throw new ForbiddenException(error.code, error.meta.target);
-      return error;
-    }
+    return await this.boxService.deleteBox(id);
   }
 }
