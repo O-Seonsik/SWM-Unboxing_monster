@@ -56,10 +56,7 @@ export class BoxController {
   ): Promise<Box> {
     return await this.boxService.updateBox({
       where: { id: id },
-      data: {
-        title: body.title,
-        price: body.price,
-      },
+      data: body,
     });
   }
 

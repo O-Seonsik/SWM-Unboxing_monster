@@ -7,6 +7,7 @@ export class CreateBoxDto {
    */
   @IsString()
   readonly title: string;
+
   /**
    * 상품가격
    * @example '15000'
@@ -20,4 +21,18 @@ export class CreateBoxDto {
    */
   @IsString()
   readonly ownerId: string;
+
+  /**
+   * 박스 대표 이미지 url
+   * @example 'https://test.com/resource/test.png
+   */
+  @IsString()
+  readonly image: string;
+
+  /**
+   * 박스 세부 설명
+   * @example '한우 박스입니다. 풀내음이 가득한 박스지요!'
+   */
+  @IsString()
+  readonly detail: string;
 }

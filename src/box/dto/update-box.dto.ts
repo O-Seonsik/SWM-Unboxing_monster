@@ -18,4 +18,19 @@ export class UpdateBoxDto extends PartialType(CreateBoxDto) {
   @IsOptional()
   @IsNumber()
   readonly price?: number;
+
+  /**
+   * 박스 대표 이미지 url
+   * @example 'https://test.com/resource/test.png
+   */
+  @IsOptional()
+  @IsString()
+  readonly image: string;
+
+  /**
+   * 박스 세부 설명
+   * @example '한우 박스입니다. 풀내음이 가득한 박스지요!'
+   */
+  @IsString()
+  readonly detail: string;
 }
