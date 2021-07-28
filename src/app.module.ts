@@ -7,6 +7,7 @@ import { BoxModule } from './box/box.module';
 import { ItemModule } from './item/item.module';
 import { BoxitemModule } from './boxitem/boxitem.module';
 import { NoticeModule } from './notice/notice.module';
+import { PurchaseModule } from './purchase/purchase.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { NoticeModule } from './notice/notice.module';
     ItemModule,
     BoxitemModule,
     NoticeModule,
+    PurchaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
