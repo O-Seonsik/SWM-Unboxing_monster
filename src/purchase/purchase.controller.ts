@@ -3,15 +3,11 @@ import { PurchaseService } from './purchase.service';
 import { Purchase } from '@prisma/client';
 import { ApiTags } from '@nestjs/swagger';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
-import { PrismaService } from '../prisma/prisma.service';
 
 @ApiTags('purchase')
 @Controller('purchase')
 export class PurchaseController {
-  constructor(
-    private readonly purchaseService: PurchaseService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly purchaseService: PurchaseService) {}
 
   @Get()
   async getPurchases(): Promise<Purchase[]> {
