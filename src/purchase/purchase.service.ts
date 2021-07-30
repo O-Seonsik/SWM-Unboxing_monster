@@ -61,7 +61,6 @@ export class PurchaseService {
         throw new NotFoundException(
           `The ${error.meta.field_name} doesn't exist in our service`,
         );
-      console.log(error);
       return error;
     }
   }
