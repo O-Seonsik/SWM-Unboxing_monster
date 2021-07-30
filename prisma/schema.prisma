@@ -16,6 +16,7 @@ model User {
     point       Int     @default(0)
     box         Box[]
     cart        Cart[]
+    coupon      Coupon[]
     Purchase    Purchase[]
 }
 
@@ -39,6 +40,7 @@ model Item {
     image   String
     detail  String
     boxes   BoxItem[]
+    coupon  Coupon[]
 }
 
 model Cart {
@@ -65,7 +67,7 @@ model BoxPurchase{
     purchaseId  Int
 }
 
-model Purchase{
+model Purchase {
     id              Int         @default(autoincrement())   @id
     owner           User        @relation(fields: [ownerId], references: [id])
     ownerId         String
@@ -76,8 +78,18 @@ model Purchase{
     refundAt        DateTime?
 }
 
-model Notice{
+model Notice {
     id      Int     @default(autoincrement())   @id
     imgUrl  String
     srcUrl  String
+}
+//  창고를 열면, userId기준 Coupon을 모두 가져옴,
+model Coupon {
+    id      Int     @default(autoincrement())   @id
+    owner   User    @relation(fields: [ownerId], references: [id])
+    ownerId String
+    item    Item    @relation(fields: [itemId], references: [id])
+    itemId  Int
+    qr      String
+    isUse   Boolean
 }
