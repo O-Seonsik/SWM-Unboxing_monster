@@ -9,6 +9,8 @@ import { BoxitemModule } from './boxitem/boxitem.module';
 import { NoticeModule } from './notice/notice.module';
 import { PurchaseModule } from './purchase/purchase.module';
 import { CouponModule } from './coupon/coupon.module';
+import { BoxStorageModule } from './box-storage/box-storage.module';
+import { BoxStrageController } from './box-strage/box-strage.controller';
 
 @Module({
   imports: [
@@ -20,8 +22,9 @@ import { CouponModule } from './coupon/coupon.module';
     NoticeModule,
     PurchaseModule,
     CouponModule,
+    BoxStorageModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, BoxStrageController],
   providers: [AppService],
 })
 export class AppModule {}
