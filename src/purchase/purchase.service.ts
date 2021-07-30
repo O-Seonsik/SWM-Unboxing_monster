@@ -25,27 +25,35 @@ export class PurchaseService {
   }
 
   async createPurchase(body: CreatePurchaseDto): Promise<Purchase> {
-    const { ownerId, price, boxesId } = body;
-    const purchase = await this.prismaService.purchase.create({
-      data: {
-        ownerId: ownerId,
-        price: price,
-        refundAt: null,
-      },
-    });
+    try {
+      const { ownerId, price, boxesId } = body;
+      const purchase = await this.prismaService.purchase.create({
+        data: {
+          ownerId: ownerId,
+          price: price,
+          refundAt: null,
+        },
+      });
 
-    const boxPurchase = boxesId.map((boxId) => {
-      return { boxId: boxId, purchaseId: purchase.id };
-    });
+      const boxPurchase = boxesId.map((boxId) => {
+        return { boxId: boxId, purchaseId: purchase.id };
+      });
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    await this.createBoxPurchase(boxPurchase);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      await this.createBoxPurchase(boxPurchase);
 
-    return await this.prismaService.purchase.findUnique({
-      where: { id: purchase.id },
-      include: { owner: true },
-    });
+      return await this.prismaService.purchase.findUnique({
+        where: { id: purchase.id },
+        include: { owner: true },
+      });
+    } catch (error) {
+      if (error.code === 'P2003')
+        throw new NotFoundException(
+          `The ${error.meta.field_name} doesn't exist in our service`,
+        );
+      return error;
+    }
   }
 
   async createBoxPurchase(
