@@ -60,7 +60,6 @@ model BoxItem {
     itemId  Int
 }
 
-
 model BoxPurchase{
     id          Int         @default(autoincrement())   @id
     box         Box         @relation(fields: [boxId], references: [id])
@@ -102,5 +101,5 @@ model BoxStorage {
     ownerId String
     box     Box     @relation(fields: [boxId], references: [id])
     boxId   Int
-    count   Int     @default(1)
+    count   Int?    @default(1)
 }
