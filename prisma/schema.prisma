@@ -16,6 +16,7 @@ model User {
     point       Int     @default(0)
     box         Box[]
     cart        Cart[]
+    boxStorage  BoxStorage[]
     coupon      Coupon[]
     Purchase    Purchase[]
 }
@@ -30,6 +31,7 @@ model Box {
     ownerId     String
     items       BoxItem[]
     purchase    BoxPurchase[]
+    boxStorage  BoxStorage[]
     sales       Int     @default(0)
 }
 
@@ -92,4 +94,13 @@ model Coupon {
     itemId  Int
     qr      String
     isUse   Boolean
+}
+
+model BoxStorage {
+    id      Int     @default(autoincrement())   @id
+    owner   User    @relation(fields: [ownerId], references: [id])
+    ownerId String
+    box     Box     @relation(fields: [boxId], references: [id])
+    boxId   Int
+    count   Int     @default(1)
 }
