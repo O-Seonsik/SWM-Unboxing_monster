@@ -10,7 +10,6 @@ import { NoticeModule } from './notice/notice.module';
 import { PurchaseModule } from './purchase/purchase.module';
 import { CouponModule } from './coupon/coupon.module';
 import { BoxStorageModule } from './box-storage/box-storage.module';
-import { BoxStrageController } from './box-strage/box-strage.controller';
 
 @Module({
   imports: [
@@ -24,7 +23,7 @@ import { BoxStrageController } from './box-strage/box-strage.controller';
     CouponModule,
     BoxStorageModule,
   ],
-  controllers: [AppController, BoxStrageController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
