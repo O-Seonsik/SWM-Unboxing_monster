@@ -48,6 +48,25 @@ export class CouponService {
     }
   }
 
+  async useCoupon(
+    couponWhereUniqueInput: Prisma.CouponWhereUniqueInput,
+  ): Promise<Coupon> {
+    try {
+      return await this.prismaService.coupon.update({
+        where: couponWhereUniqueInput,
+        data: {
+          isUse: true,
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2025')
+        throw new NotFoundException(error.code, error.meta.cause);
+      if (error.code === 'P2002')
+        throw new ForbiddenException(error.code, error.meta.target);
+      return error;
+    }
+  }
+
   async deleteCoupon(
     couponWhereUniqueInput: Prisma.CouponWhereUniqueInput,
   ): Promise<Coupon> {

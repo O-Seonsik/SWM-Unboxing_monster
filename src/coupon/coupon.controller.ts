@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CouponService } from './coupon.service';
 import { Coupon } from '@prisma/client';
 import { CreateCouponDto } from './dto/create-coupon.dto';
@@ -22,6 +30,11 @@ export class CouponController {
   @Post()
   async createCoupon(@Body() body: CreateCouponDto): Promise<Coupon> {
     return await this.couponService.createCoupon(body);
+  }
+
+  @Patch('use/:id')
+  async useCoupon(@Param('id') id: number): Promise<Coupon> {
+    return await this.couponService.useCoupon({ id: id });
   }
 
   @Delete(':id')
