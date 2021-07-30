@@ -8,6 +8,7 @@ import { ItemModule } from './item/item.module';
 import { BoxitemModule } from './boxitem/boxitem.module';
 import { NoticeModule } from './notice/notice.module';
 import { PurchaseModule } from './purchase/purchase.module';
+import { CouponModule } from './coupon/coupon.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PurchaseModule } from './purchase/purchase.module';
     BoxitemModule,
     NoticeModule,
     PurchaseModule,
+    CouponModule,
   ],
   controllers: [AppController],
   providers: [AppService],
