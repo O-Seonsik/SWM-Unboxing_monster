@@ -85,7 +85,7 @@ model Notice {
     imgUrl  String
     srcUrl  String
 }
-//  창고를 열면, userId기준 Coupon을 모두 가져옴,
+
 model Coupon {
     id      Int     @default(autoincrement())   @id
     owner   User    @relation(fields: [ownerId], references: [id])
