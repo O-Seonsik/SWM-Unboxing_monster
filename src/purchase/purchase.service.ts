@@ -6,7 +6,6 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Purchase } from '@prisma/client';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
-import { timestamp } from 'rxjs/operators';
 
 @Injectable()
 export class PurchaseService {
@@ -35,7 +34,7 @@ export class PurchaseService {
       },
     });
 
-    const boxPurchase = await boxesId.map((boxId) => {
+    const boxPurchase = boxesId.map((boxId) => {
       return { boxId: boxId, purchaseId: purchase.id };
     });
 
