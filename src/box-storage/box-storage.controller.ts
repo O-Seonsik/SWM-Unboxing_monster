@@ -2,7 +2,9 @@ import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { BoxStorageService } from './box-storage.service';
 import { BoxStorage } from '@prisma/client';
 import { CreateBoxStorageDto } from './dto/create-box-storage.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('boxStorage')
 @Controller('box-storage')
 export class BoxStorageController {
   constructor(private readonly boxStorageService: BoxStorageService) {}
