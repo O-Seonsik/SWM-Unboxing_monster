@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Coupon } from '@prisma/client';
 import { CreateCouponDto } from './dto/create-coupon.dto';
@@ -25,22 +29,38 @@ export class CouponService {
   }
 
   async createCoupon(body: CreateCouponDto): Promise<Coupon> {
-    const { ownerId, itemId, qr } = body;
-    return await this.prismaService.coupon.create({
-      data: {
-        ownerId: ownerId,
-        itemId: itemId,
-        qr: qr,
-        isUse: false,
-      },
-    });
+    try {
+      const { ownerId, itemId, qr } = body;
+      return await this.prismaService.coupon.create({
+        data: {
+          ownerId: ownerId,
+          itemId: itemId,
+          qr: qr,
+          isUse: false,
+        },
+      });
+    } catch (error) {
+      if (error.code === 'P2003')
+        throw new NotFoundException(
+          `The ${error.meta.field_name} doesn't exist in our service`,
+        );
+      return error;
+    }
   }
 
   async deleteCoupon(
     couponWhereUniqueInput: Prisma.CouponWhereUniqueInput,
   ): Promise<Coupon> {
-    return await this.prismaService.coupon.delete({
-      where: couponWhereUniqueInput,
-    });
+    try {
+      return await this.prismaService.coupon.delete({
+        where: couponWhereUniqueInput,
+      });
+    } catch (error) {
+      if (error.code === 'P2025')
+        throw new NotFoundException(error.code, error.meta.cause);
+      if (error.code === 'P2002')
+        throw new ForbiddenException(error.code, error.meta.target);
+      return error;
+    }
   }
 }
