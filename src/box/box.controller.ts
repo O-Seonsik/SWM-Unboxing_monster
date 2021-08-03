@@ -3,9 +3,7 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -32,16 +30,16 @@ export class BoxController {
     return await this.boxService.getBoxes();
   }
 
-  @Get(':id')
-  async getBox(@Param('id') id: number): Promise<BoxEntity> {
-    return await this.boxService.getBox({ id: id });
-  }
-
   @Get('popular')
   async getPopularBoxes(@Req() req): Promise<Box[]> {
     const take = req.query.take ? parseInt(req.query.take) : 5;
     if (!take) throw new BadRequestException('take must be a integer');
     return await this.boxService.getPopularBoxes(take);
+  }
+
+  @Get(':id')
+  async getBox(@Param('id') id: number): Promise<BoxEntity> {
+    return await this.boxService.getBox({ id: id });
   }
 
   @Post()
