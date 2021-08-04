@@ -66,6 +66,7 @@ model BoxPurchase{
     boxId       Int
     purchase    Purchase    @relation(fields: [purchaseId], references: [id])
     purchaseId  Int
+    count       Int?
 }
 
 model Purchase {
