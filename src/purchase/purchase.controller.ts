@@ -20,12 +20,12 @@ export class PurchaseController {
   }
 
   @Post()
-  async createPurchase(@Body() body: CreatePurchaseDto) {
+  async createPurchase(@Body() body: CreatePurchaseDto): Promise<Purchase> {
     return await this.purchaseService.createPurchase(body);
   }
 
   @Patch(':id')
-  async refundPurchase(@Param('id') id: number) {
+  async refundPurchase(@Param('id') id: number): Promise<Purchase> {
     return await this.purchaseService.refundPurchase({ id: id });
   }
 }
