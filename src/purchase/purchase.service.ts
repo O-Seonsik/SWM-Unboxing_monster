@@ -17,16 +17,25 @@ export class PurchaseService {
 
   async getPurchase(
     purchaseWhereUniqueInput: Prisma.PurchaseWhereUniqueInput,
-  ): Promise<Purchase> {
-    return await this.prismaService.purchase.findUnique({
+  ): Promise<Purchase | any> {
+    const purchase = await this.prismaService.purchase.findUnique({
       where: purchaseWhereUniqueInput,
       include: { owner: true, boxes: { include: { box: true } } },
     });
+
+    return {
+      ...purchase,
+      boxes: purchase.boxes.map((box) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        return { ...box.box, count: box.count };
+      }),
+    };
   }
 
-  async createPurchase(body: CreatePurchaseDto): Promise<Purchase> {
+  async createPurchase(body: CreatePurchaseDto): Promise<Purchase | any> {
     try {
-      const { ownerId, price, boxesId } = body;
+      const { ownerId, price, boxes } = body;
       const purchase = await this.prismaService.purchase.create({
         data: {
           ownerId: ownerId,
@@ -35,13 +44,32 @@ export class PurchaseService {
         },
       });
 
-      const boxPurchase = boxesId.map((boxId) => {
-        return { boxId: boxId, purchaseId: purchase.id };
+      const boxPurchase = boxes.map((box) => {
+        return {
+          boxId: box.boxId,
+          purchaseId: purchase.id,
+          count: box.count,
+        };
       });
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      await this.createBoxPurchase(boxPurchase);
+      try {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await this.createBoxPurchase(boxPurchase);
+      } catch (error) {
+        console.log(error);
+        return error;
+      }
+
+      const boxStorageList = boxes.map((box) => {
+        return {
+          ownerId: ownerId,
+          boxId: box.boxId,
+          count: box.count,
+        };
+      });
+
+      await this.prismaService.boxStorage.createMany({ data: boxStorageList });
 
       return await this.prismaService.purchase.findUnique({
         where: { id: purchase.id },
@@ -69,7 +97,7 @@ export class PurchaseService {
         throw new NotFoundException(
           `The ${error.meta.field_name} doesn't exist in our service`,
         );
-      return error;
+      return Promise.reject(error);
     }
   }
 

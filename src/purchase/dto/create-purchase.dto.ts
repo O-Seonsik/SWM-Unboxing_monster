@@ -1,4 +1,11 @@
-import { ArrayMinSize, IsNumber, IsString } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsNumber,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreatePurchaseDto {
   /**
@@ -15,10 +22,28 @@ export class CreatePurchaseDto {
   @IsNumber()
   readonly price: number;
   /**
-   * 구매한 박스의 아이디 배열
-   * @example '[1, 2, 3, 4, 5]'
+   * 구매한 박스의 배열(id, count)
+   * @example '[{boxId: 1, count: 2},{boxId: 2, count: 1}]'
    */
-  @IsNumber({}, { each: true })
+  @IsArray()
+  @ValidateNested({ each: true })
   @ArrayMinSize(1)
-  readonly boxesId: number[];
+  @Type(() => Box)
+  readonly boxes: Box[];
+}
+
+class Box {
+  /**
+   * 구매한 박스 id
+   * @example 234
+   */
+  @IsNumber()
+  readonly boxId: number;
+
+  /**
+   * 구매한 밗의 개수
+   * @example 2
+   */
+  @IsNumber()
+  readonly count: number;
 }

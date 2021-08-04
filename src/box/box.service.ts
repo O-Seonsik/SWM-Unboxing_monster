@@ -23,7 +23,6 @@ export class BoxService {
       where: boxWhereUniqueInput,
       include: { items: { include: { item: true } } },
     });
-
     return { ...box, items: box.items.map((item) => item.item) };
   }
 
