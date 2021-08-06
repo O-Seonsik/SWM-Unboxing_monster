@@ -15,8 +15,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Login_Test')
-    .setDescription('The Login Test API description')
+    .setTitle('Unboxing')
+    .setDescription('Unboxing Test API description')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
