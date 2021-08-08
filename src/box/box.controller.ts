@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -35,6 +36,11 @@ export class BoxController {
     const take = req.query.take ? parseInt(req.query.take) : 5;
     if (!take) throw new BadRequestException('take must be a integer');
     return await this.boxService.getPopularBoxes(take);
+  }
+
+  @Get('open/:id')
+  async getBoxOpen(@Param('id') id: number, @Query() q) {
+    return await this.boxService.getBoxOpen(id, +q.count);
   }
 
   @Get(':id')
