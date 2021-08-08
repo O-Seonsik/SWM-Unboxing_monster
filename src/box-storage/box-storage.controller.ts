@@ -1,4 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { BoxStorageService } from './box-storage.service';
 import { BoxStorage } from '@prisma/client';
 import { CreateBoxStorageDto } from './dto/create-box-storage.dto';
@@ -22,7 +30,7 @@ export class BoxStorageController {
   @Post()
   async createBoxStorage(
     @Body() body: CreateBoxStorageDto,
-  ): Promise<BoxStorage> {
+  ): Promise<BoxStorage | ForbiddenException> {
     return this.boxStorageService.createBoxStorage(body);
   }
 
