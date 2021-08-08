@@ -9,12 +9,14 @@ import { Prisma, Box } from '@prisma/client';
 import { BoxEntity } from './entities/box.entity';
 import { CreateBoxDto } from './dto/create-box.dto';
 import { HttpService } from '@nestjs/axios';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class BoxService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly httpService: HttpService,
+    private readonly usersService: UsersService,
   ) {}
 
   async getBoxes(): Promise<Box[]> {
@@ -76,41 +78,75 @@ export class BoxService {
     }
   }
 
-  async getBoxOpen(id: number, count = 1): Promise<any> {
-    const box: any = await this.prismaService.box.findUnique({
-      where: { id: id },
-      include: { items: { include: { item: true } } },
-    });
-
-    const data = box.items.map((item) => {
-      return {
-        id: item.id,
-        price: item.item.price,
-      };
-    });
-
-    data.sort((a, b) => (a.price < b.price ? 1 : -1));
-    const reverseSortedList = data.map((item) => item.price);
-    const a = data.map((item) => item.id.toString());
-    const prob = this.generateProbability(reverseSortedList, box.price);
-    const kwargs = JSON.stringify({ a: a, p: prob, size: count });
-    const test = {
-      request_id: 'test',
-      kwargs: kwargs,
-    };
-
+  async getBoxOpen(
+    id: number,
+    count: number,
+    userId = 'k1804801727',
+  ): Promise<any> {
     try {
-      const result = await this.httpService
-        .post('http://open.prider.xyz/api/random/choice', test)
-        .toPromise();
+      const userBoxes: any = await this.usersService.getUser({ id: userId });
+      const targetBox = userBoxes.boxStorage.filter(
+        (box) => box.boxId === id,
+      )[0];
 
-      console.log(result.data);
-      return result.data;
+      if (!targetBox) {
+        return new NotFoundException(
+          'Not found exception',
+          `User doesn't have box id ${id}`,
+        );
+      } else if (targetBox.count < count) {
+        return new ForbiddenException(
+          'Forbidden exception',
+          `User has only ${targetBox.count} boxes but request ${count} boxes`,
+        );
+      }
+
+      const openBox: any = await this.prismaService.box.findUnique({
+        where: { id: id },
+        include: { items: { include: { item: true } } },
+      });
+
+      const data = openBox.items.map((item) => {
+        return {
+          id: item.item.id,
+          price: item.item.price,
+        };
+      });
+
+      data.sort((a, b) => (a.price < b.price ? 1 : -1));
+      const reverseSortedList = data.map((item) => item.price);
+      const a = data.map((item) => item.id.toString());
+      const prob = this.generateProbability(reverseSortedList, openBox.price);
+      const kwargs = JSON.stringify({ a: a, p: prob, size: count });
+      const reqBody = {
+        request_id: 'test',
+        kwargs: kwargs,
+      };
+
+      try {
+        const result = await this.httpService
+          .post('http://open.prider.xyz/api/random/choice', reqBody)
+          .toPromise();
+
+        if (targetBox.count - count) {
+          await this.prismaService.boxStorage.update({
+            where: { id: targetBox.id },
+            data: { count: targetBox.count - count },
+          });
+        } else {
+          await this.prismaService.boxStorage.delete({
+            where: { id: targetBox.id },
+          });
+        }
+        return result.data;
+      } catch (error) {
+        return new InternalServerErrorException(
+          'Opening server error',
+          'The opening server with blockchain is occurred error',
+        );
+      }
     } catch (error) {
-      throw new InternalServerErrorException(
-        'Opening server error',
-        'The opening server with blockchain is occurred error',
-      );
+      return error;
     }
   }
 

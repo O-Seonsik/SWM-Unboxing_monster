@@ -27,9 +27,21 @@ export class BoxStorageService {
     });
   }
 
-  async createBoxStorage(body: CreateBoxStorageDto): Promise<BoxStorage> {
+  async createBoxStorage(
+    body: CreateBoxStorageDto,
+  ): Promise<BoxStorage | ForbiddenException> {
     try {
       const { ownerId, boxId, count } = body;
+      const box = await this.prismaService.box.findUnique({
+        where: { id: boxId },
+        include: { items: { include: { item: true } } },
+      });
+
+      if (!box.items.length)
+        return new ForbiddenException(
+          'ForbiddenException',
+          'the box is empty box',
+        );
       return await this.prismaService.boxStorage.create({
         data: {
           ownerId: ownerId,

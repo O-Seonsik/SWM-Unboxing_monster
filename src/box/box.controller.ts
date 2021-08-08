@@ -40,7 +40,7 @@ export class BoxController {
 
   @Get('open/:id')
   async getBoxOpen(@Param('id') id: number, @Query() q) {
-    return await this.boxService.getBoxOpen(id, +q.count);
+    return await this.boxService.getBoxOpen(id, q.count ? +q.count : 1);
   }
 
   @Get(':id')
