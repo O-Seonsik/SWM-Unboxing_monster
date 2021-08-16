@@ -26,11 +26,20 @@ export class BoxService {
   async getBox(
     boxWhereUniqueInput: Prisma.BoxWhereUniqueInput,
   ): Promise<BoxEntity> {
-    const box = await this.prismaService.box.findUnique({
-      where: boxWhereUniqueInput,
-      include: { items: { include: { item: true } } },
-    });
-    return { ...box, items: box.items.map((item) => item.item) };
+    try {
+      const box = await this.prismaService.box.findUnique({
+        where: boxWhereUniqueInput,
+        include: { items: { include: { item: true } } },
+      });
+      if (!box)
+        throw new NotFoundException(
+          `The ${boxWhereUniqueInput.id} box is not here`,
+          'Not found exception',
+        );
+      return { ...box, items: box.items.map((item) => item.item) };
+    } catch (error) {
+      return error;
+    }
   }
 
   async getPopularBoxes(take: number): Promise<Box[]> {
