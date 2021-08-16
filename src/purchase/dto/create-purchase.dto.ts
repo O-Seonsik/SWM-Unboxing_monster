@@ -23,7 +23,7 @@ export class CreatePurchaseDto {
   readonly price: number;
   /**
    * 구매한 박스의 배열(id, count)
-   * @example '[{boxId: 1, count: 2},{boxId: 2, count: 1}]'
+   * @example "[{boxId: 1, count: 2},{boxId: 2, count: 1}]"
    */
   @IsArray()
   @ValidateNested({ each: true })

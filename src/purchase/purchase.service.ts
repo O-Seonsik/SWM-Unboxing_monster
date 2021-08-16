@@ -4,15 +4,27 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, Purchase } from '@prisma/client';
+import { Prisma, Purchase, BoxStorage } from '@prisma/client';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
+import { BoxStorageService } from '../box-storage/box-storage.service';
 
 @Injectable()
 export class PurchaseService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly boxStorageService: BoxStorageService,
+  ) {}
 
   async getPurchases(): Promise<Purchase[]> {
     return await this.prismaService.purchase.findMany();
+  }
+
+  async getUserPurchase(
+    purchaseWhereInput: Prisma.PurchaseWhereInput,
+  ): Promise<Purchase[]> {
+    return await this.prismaService.purchase.findMany({
+      where: purchaseWhereInput,
+    });
   }
 
   async getPurchase(
@@ -33,8 +45,27 @@ export class PurchaseService {
     };
   }
 
+  async checkPurchase(boxes): Promise<boolean> {
+    const results = await Promise.all(
+      boxes.map(async (box) => {
+        const curBox = await this.prismaService.box.findUnique({
+          where: { id: box.boxId },
+          include: { items: { include: { item: true } } },
+        });
+        return curBox.items.length;
+      }),
+    );
+
+    const result = results.filter((result) => !result);
+
+    if (result.length)
+      throw new ForbiddenException('Requests containing empty boxes');
+    return true;
+  }
+
   async createPurchase(body: CreatePurchaseDto): Promise<Purchase | any> {
     try {
+      await this.checkPurchase(body.boxes);
       const { ownerId, price, boxes } = body;
       const purchase = await this.prismaService.purchase.create({
         data: {

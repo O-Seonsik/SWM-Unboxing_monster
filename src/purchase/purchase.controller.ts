@@ -14,6 +14,11 @@ export class PurchaseController {
     return await this.purchaseService.getPurchases();
   }
 
+  @Get('user/:id')
+  async getUserPurchase(@Param('id') id: string): Promise<Purchase[]> {
+    return await this.purchaseService.getUserPurchase({ ownerId: id });
+  }
+
   @Get(':id')
   async getPurchase(@Param('id') id: number): Promise<Purchase> {
     return await this.purchaseService.getPurchase({ id: id });
