@@ -26,19 +26,26 @@ export class PurchaseService {
   async getPurchase(
     purchaseWhereUniqueInput: Prisma.PurchaseWhereUniqueInput,
   ): Promise<Purchase | any> {
-    const purchase = await this.prismaService.purchase.findUnique({
-      where: purchaseWhereUniqueInput,
-      include: { owner: true, boxes: { include: { box: true } } },
-    });
+    try {
+      const purchase = await this.prismaService.purchase.findUnique({
+        where: purchaseWhereUniqueInput,
+        include: { owner: true, boxes: { include: { box: true } } },
+      });
 
-    return {
-      ...purchase,
-      boxes: purchase.boxes.map((box) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        return { ...box.box, count: box.count };
-      }),
-    };
+      return {
+        ...purchase,
+        boxes: purchase.boxes.map((box) => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          return { ...box.box, count: box.count };
+        }),
+      };
+    } catch (error) {
+      throw new NotFoundException(
+        `Server doesn't have ${purchaseWhereUniqueInput.id} purchase`,
+        'Not Found Exception',
+      );
+    }
   }
 
   async checkPurchase(boxes): Promise<boolean> {
