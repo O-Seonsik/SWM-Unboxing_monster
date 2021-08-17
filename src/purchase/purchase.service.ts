@@ -4,16 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, Purchase, BoxStorage } from '@prisma/client';
+import { Prisma, Purchase } from '@prisma/client';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
-import { BoxStorageService } from '../box-storage/box-storage.service';
 
 @Injectable()
 export class PurchaseService {
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly boxStorageService: BoxStorageService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async getPurchases(): Promise<Purchase[]> {
     return await this.prismaService.purchase.findMany();
@@ -83,24 +79,35 @@ export class PurchaseService {
         };
       });
 
-      try {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        await this.createBoxPurchase(boxPurchase);
-      } catch (error) {
-        console.log(error);
-        return error;
-      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      await this.createBoxPurchase(boxPurchase);
 
-      const boxStorageList = boxes.map((box) => {
-        return {
-          ownerId: ownerId,
-          boxId: box.boxId,
-          count: box.count,
-        };
-      });
+      const boxStorageList = await Promise.all(
+        body.boxes.map(async (box) => {
+          const boxCheck = await this.prismaService.boxStorage.findFirst({
+            where: { boxId: box.boxId, ownerId: 'k1804801727' },
+          });
+          if (boxCheck)
+            await this.prismaService.boxStorage.update({
+              where: { id: boxCheck.id },
+              data: {
+                count: boxCheck.count + box.count,
+              },
+            });
+          else
+            return {
+              ownerId: ownerId,
+              boxId: box.boxId,
+              count: box.count,
+            };
+        }),
+      );
 
-      await this.prismaService.boxStorage.createMany({ data: boxStorageList });
+      if (boxStorageList.length)
+        await this.prismaService.boxStorage.createMany({
+          data: boxStorageList,
+        });
 
       return await this.prismaService.purchase.findUnique({
         where: { id: purchase.id },
