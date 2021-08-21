@@ -10,6 +10,7 @@ import { NoticeModule } from './notice/notice.module';
 import { PurchaseModule } from './purchase/purchase.module';
 import { CouponModule } from './coupon/coupon.module';
 import { BoxStorageModule } from './box-storage/box-storage.module';
+import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { BoxStorageModule } from './box-storage/box-storage.module';
     PurchaseModule,
     CouponModule,
     BoxStorageModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
