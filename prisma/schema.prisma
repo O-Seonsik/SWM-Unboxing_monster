@@ -108,7 +108,7 @@ model BoxStorage {
 
 model OpenResult {
     id      Int  @default(autoincrement()) @id
-    boxid   Int
+    boxId   Int
     userId  Int
     itemId  Int
 }
