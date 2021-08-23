@@ -8,6 +8,7 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
+//  previewFeatures = ["referentialActions"]
 }
 
 model User {
@@ -103,4 +104,11 @@ model BoxStorage {
     box     Box     @relation(fields: [boxId], references: [id])
     boxId   Int
     count   Int?    @default(1)
+}
+
+model OpenResult {
+    id      Int  @default(autoincrement()) @id
+    boxid   Int
+    userId  Int
+    itemId  Int
 }
