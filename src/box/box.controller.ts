@@ -18,6 +18,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { UpdateBoxDto } from './dto/update-box.dto';
 import { BoxEntity } from './entities/box.entity';
 import { BoxService } from './box.service';
+import { CustomBoxDto } from './dto/custom-box.dto';
 
 @ApiTags('Box')
 @Controller('box')
@@ -33,8 +34,8 @@ export class BoxController {
   }
 
   @Get('custom')
-  async getCustomBoxes() {
-    const sql = `SELECT * FROM Box WHERE ownerId != 'master' ORDER BY RAND();`;
+  async getCustomBoxes(@Query() q: CustomBoxDto) {
+    const sql = `SELECT * FROM Box WHERE ownerId != 'master' ORDER BY RAND() LIMIT ${q.take};`;
     try {
       return await this.prismaService.$queryRaw(sql);
     } catch (error) {
