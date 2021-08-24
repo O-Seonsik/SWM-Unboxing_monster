@@ -10,6 +10,7 @@ import { BoxEntity } from './entities/box.entity';
 import { CreateBoxDto } from './dto/create-box.dto';
 import { HttpService } from '@nestjs/axios';
 import { UsersService } from '../users/users.service';
+import { OpenResultService } from '../open-result/open-result.service';
 
 @Injectable()
 export class BoxService {
@@ -17,6 +18,7 @@ export class BoxService {
     private readonly prismaService: PrismaService,
     private readonly httpService: HttpService,
     private readonly usersService: UsersService,
+    private readonly openResultService: OpenResultService,
   ) {}
 
   async getBoxes(): Promise<Box[]> {
@@ -133,9 +135,19 @@ export class BoxService {
       };
 
       try {
-        const result = await this.httpService
-          .post('http://open.prider.xyz/api/random/choice', reqBody)
-          .toPromise();
+        const result = (
+          await this.httpService
+            .post('http://open.prider.xyz/api/random/choice', reqBody)
+            .toPromise()
+        ).data
+          .replace(/[\[\]'\n|\r/]+/g, '')
+          .split(' ')
+          .map((item) => parseInt(item));
+
+        // 당첨 기록
+        result.map(async (itemId) => {
+          await this.openResultService.createOpenResult(id, userId, itemId);
+        });
 
         if (targetBox.count - count) {
           await this.prismaService.boxStorage.update({
@@ -147,7 +159,9 @@ export class BoxService {
             where: { id: targetBox.id },
           });
         }
-        return result.data;
+        return {
+          result: result,
+        };
       } catch (error) {
         return new InternalServerErrorException(
           'Opening server error',

@@ -20,6 +20,7 @@ model User {
     boxStorage  BoxStorage[]
     coupon      Coupon[]
     Purchase    Purchase[]
+    openResult  OpenResult[]
 }
 
 model Box {
@@ -107,8 +108,10 @@ model BoxStorage {
 }
 
 model OpenResult {
-    id      Int  @default(autoincrement()) @id
+    id      Int     @default(autoincrement()) @id
     boxId   Int
-    userId  Int
+    user    User    @relation(fields: [userId], references: [id])
+    userId  String
     itemId  Int
+    openAt  DateTime    @default(now())
 }
