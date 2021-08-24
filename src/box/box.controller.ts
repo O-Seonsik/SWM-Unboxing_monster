@@ -34,7 +34,7 @@ export class BoxController {
   }
 
   @Get('custom')
-  async getCustomBoxes(@Query() q: CustomBoxDto) {
+  async getCustomBoxes(@Query() q: CustomBoxDto): Promise<Box[]> {
     const sql = `SELECT * FROM Box WHERE ownerId != 'master' ORDER BY RAND() LIMIT ${q.take};`;
     try {
       return await this.prismaService.$queryRaw(sql);
@@ -48,6 +48,11 @@ export class BoxController {
     const take = req.query.take ? parseInt(req.query.take) : 5;
     if (!take) throw new BadRequestException('take must be a integer');
     return await this.boxService.getPopularBoxes(take);
+  }
+
+  @Get('search/:keyword')
+  async searchBoxes(@Param('keyword') keyword: string): Promise<Box[]> {
+    return await this.boxService.searchBoxes(keyword);
   }
 
   @Get('open/:id')

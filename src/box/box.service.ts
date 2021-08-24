@@ -51,6 +51,15 @@ export class BoxService {
     });
   }
 
+  async searchBoxes(keyword: string): Promise<Box[]> {
+    return await this.prismaService.box.findMany({
+      where: {
+        title: {
+          contains: keyword,
+        },
+      },
+    });
+  }
   async createBox(box: CreateBoxDto): Promise<Box> {
     try {
       return await this.prismaService.box.create({ data: box });
