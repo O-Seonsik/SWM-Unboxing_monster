@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   Patch,
   Post,
@@ -29,6 +30,16 @@ export class BoxController {
   @Get()
   async getBoxes(): Promise<Box[]> {
     return await this.boxService.getBoxes();
+  }
+
+  @Get('custom')
+  async getCustomBoxes() {
+    const sql = `SELECT * FROM Box WHERE ownerId != 'master' ORDER BY RAND();`;
+    try {
+      return await this.prismaService.$queryRaw(sql);
+    } catch (error) {
+      throw InternalServerErrorException;
+    }
   }
 
   @Get('popular')
