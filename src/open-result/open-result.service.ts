@@ -13,7 +13,7 @@ export class OpenResultService {
     take: number,
   ): Promise<openResult> {
     const openResults = await this.prismaService.openResult.findMany({
-      include: { user: true },
+      include: { user: true, item: true },
       orderBy: {
         id: 'desc',
       },

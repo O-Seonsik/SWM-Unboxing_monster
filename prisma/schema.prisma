@@ -45,6 +45,7 @@ model Item {
     detail  String
     boxes   BoxItem[]
     coupon  Coupon[]
+    openResult  OpenResult[]
 }
 
 model Cart {
@@ -111,6 +112,7 @@ model OpenResult {
     id      Int     @default(autoincrement()) @id
     boxId   Int
     user    User    @relation(fields: [userId], references: [id])
+    item    Item    @relation(fields: [itemId], references: [id])
     userId  String
     itemId  Int
     openAt  DateTime    @default(now())
