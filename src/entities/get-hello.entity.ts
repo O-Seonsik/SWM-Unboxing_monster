@@ -1,14 +1,9 @@
 export class GetHelloEntity {
   /**
    * Users primary key
-   * @example 1
+   * @example a11432fsd982314.23.234123190r2!@
    */
   readonly userId: number;
-
-  /**
-   * @example dhtjstlr777@gmail.com
-   */
-  readonly email: string;
   /**
    * @example "Hello world"
    */

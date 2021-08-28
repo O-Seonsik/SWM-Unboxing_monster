@@ -1,12 +1,6 @@
-import { IsEmail, IsEnum, IsString } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 
 export class CreateUserDto {
-  /**
-   * User's token it doesn't have bearer
-   * @example "asd132fd2j3l3df3aslk234asdf"
-   */
-  @IsString()
-  readonly token: string;
   /**
    * User's email
    * @example "email@mail.com"
@@ -14,10 +8,9 @@ export class CreateUserDto {
   @IsEmail()
   readonly email: string;
   /**
-   * User's social
-   * @example "kakao | facebook | apple"
+   * User's social id
+   * @example "144243143234"
    */
-  // @IsString()
-  @IsEnum(['kakao', 'facebook', 'apple'])
-  readonly co: string;
+  @IsString()
+  readonly id: string;
 }

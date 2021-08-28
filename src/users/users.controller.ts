@@ -30,7 +30,7 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() user: CreateUserDto): Promise<UsersEntity> {
-    return this.usersService.createUser(user);
+    return this.usersService.createUser(user.id, user.email);
   }
 
   @Patch(':id')

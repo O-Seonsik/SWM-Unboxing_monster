@@ -1,15 +1,12 @@
 import { Controller, Get, UseGuards, Request } from '@nestjs/common';
-import { AppService } from './app.service';
 import { GetHelloEntity } from './entities/get-hello.entity';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { LocalAuthGuard } from './auth/local-auth.guard';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
   @ApiBearerAuth()
-  @UseGuards(LocalAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   getHello(@Request() req): GetHelloEntity {
     return {
