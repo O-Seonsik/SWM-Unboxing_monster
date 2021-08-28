@@ -26,8 +26,13 @@ export class AuthService {
         })
         .toPromise();
       const email = userInfo.data.kakao_account.email;
-      const id = 'k' + userInfo.data.id;
-      const payload = { useremail: email, sub: id };
+      const id = userInfo.data.id;
+
+      if (!id) throw new BadRequestException();
+      const user = await this.usersService.getUser({ id: 'k' + id });
+      if (!user) throw new NotFoundException();
+
+      const payload = { useremail: email, sub: 'k' + id };
       return {
         access_token: this.jwtService.sign(payload),
       };
@@ -48,8 +53,9 @@ export class AuthService {
           headers: { Authorization: 'Bearer ' + token },
         })
         .toPromise();
-      const id = 'k' + userInfo.data.id;
-      return await this.usersService.createUser(id, email);
+      const id = userInfo.data.id;
+      if (!id) throw new BadRequestException();
+      return await this.usersService.createUser('k' + id, email);
     } catch (error) {
       if (error.response.error === 'PRIMARY')
         throw new ConflictException('The id is already registered');
@@ -82,13 +88,11 @@ export class AuthService {
         )
         .toPromise();
 
-      const id = 'f' + userInfo.data.data.user_id;
+      const id = userInfo.data.data.user_id;
       if (!id) throw new BadRequestException();
-
-      const user = await this.usersService.getUser({ id: id });
-      console.log(user);
+      const user = await this.usersService.getUser({ id: 'f' + id });
       if (!user) throw new NotFoundException();
-      const payload = { useremail: user.email, sub: id };
+      const payload = { useremail: user.email, sub: 'f' + id };
       return {
         access_token: this.jwtService.sign(payload),
       };
@@ -113,9 +117,9 @@ export class AuthService {
           `https://graph.facebook.com/debug_token?input_token=${token}&access_token=${access_token}`,
         )
         .toPromise();
-      const id = 'f' + userInfo.data.data.user_id;
+      const id = userInfo.data.data.user_id;
       if (!id) throw new BadRequestException();
-      return await this.usersService.createUser(id, email);
+      return await this.usersService.createUser('f' + id, email);
     } catch (error) {
       if (error.response.error === 'PRIMARY')
         throw new ConflictException('The id is already registered');
