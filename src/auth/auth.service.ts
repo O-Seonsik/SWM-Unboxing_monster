@@ -8,7 +8,9 @@ import {
 import { UsersService } from '../users/users.service';
 import { HttpService } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
-import { fbConfig } from './constants';
+import { fbConfig, appleConfig } from './constants';
+import { createClientSecret } from 'apple-id-client-secret';
+import verifyAppleToken from 'verify-apple-id-token';
 
 @Injectable()
 export class AuthService {
@@ -25,14 +27,13 @@ export class AuthService {
           headers: { Authorization: 'Bearer ' + token },
         })
         .toPromise();
-      const email = userInfo.data.kakao_account.email;
       const id = userInfo.data.id;
 
       if (!id) throw new BadRequestException();
       const user = await this.usersService.getUser({ id: 'k' + id });
       if (!user) throw new NotFoundException();
 
-      const payload = { useremail: email, sub: 'k' + id };
+      const payload = { useremail: user.email, sub: user.id };
       return {
         access_token: this.jwtService.sign(payload),
       };
@@ -57,7 +58,10 @@ export class AuthService {
       if (!id) throw new BadRequestException();
       return await this.usersService.createUser('k' + id, email);
     } catch (error) {
-      if (error.response.error === 'PRIMARY')
+      if (
+        error.response.error === 'PRIMARY' ||
+        error.response.statusCode === 403
+      )
         throw new ConflictException('The id is already registered');
       throw new BadRequestException(
         'The token is not available',
@@ -92,7 +96,7 @@ export class AuthService {
       if (!id) throw new BadRequestException();
       const user = await this.usersService.getUser({ id: 'f' + id });
       if (!user) throw new NotFoundException();
-      const payload = { useremail: user.email, sub: 'f' + id };
+      const payload = { useremail: user.email, sub: user.id };
       return {
         access_token: this.jwtService.sign(payload),
       };
@@ -121,7 +125,106 @@ export class AuthService {
       if (!id) throw new BadRequestException();
       return await this.usersService.createUser('f' + id, email);
     } catch (error) {
+      if (
+        error.response.error === 'PRIMARY' ||
+        error.response.statusCode === 403
+      )
+        throw new ConflictException('The id is already registered');
+      throw new BadRequestException(
+        'The token is not available',
+        'BadRequestException',
+      );
+    }
+  }
+
+  async getAppleToken(code: string) {
+    const clientSecret = createClientSecret({
+      keyId: appleConfig.keyId,
+      bundleId: appleConfig.bundleId,
+      teamId: appleConfig.teamId,
+      privateKey: appleConfig.privateKey,
+    });
+
+    const data = new URLSearchParams();
+
+    data.append('client_id', appleConfig.client_id);
+    data.append('grant_type', 'authorization_code');
+    data.append('client_secret', clientSecret);
+    data.append('redirect_uri', appleConfig.redirect_uri);
+    data.append('code', code);
+
+    try {
+      const response = await this.httpService
+        .post('https://appleid.apple.com/auth/token', data)
+        .toPromise();
+      return response.data.refresh_token;
+    } catch (error) {
+      throw new BadRequestException();
+    }
+  }
+
+  async appleTokenValidate(refresh_token) {
+    const clientSecret = createClientSecret({
+      keyId: appleConfig.keyId,
+      bundleId: appleConfig.bundleId,
+      teamId: appleConfig.teamId,
+      privateKey: appleConfig.privateKey,
+    });
+
+    const data = new URLSearchParams();
+
+    data.append('client_id', appleConfig.client_id);
+    data.append('grant_type', 'refresh_token');
+    data.append('client_secret', clientSecret);
+    data.append('redirect_uri', appleConfig.redirect_uri);
+    data.append('refresh_token', refresh_token);
+
+    try {
+      const response = await this.httpService
+        .post('https://appleid.apple.com/auth/token', data)
+        .toPromise();
+
+      const jwtClaims = await verifyAppleToken({
+        idToken: response.data.id_token,
+        clientId: 'com.unboxing.service',
+      });
+      return jwtClaims.sub;
+    } catch (error) {
+      throw new BadRequestException();
+    }
+  }
+
+  async appleLogin(refresh_token: string) {
+    try {
+      const id = await this.appleTokenValidate(refresh_token);
+      if (!id) throw new BadRequestException();
+      const user = await this.usersService.getUser({ id: 'a' + id });
+      if (!user) throw new NotFoundException();
+
+      const payload = { useremail: user.email, sub: user.id };
+      return {
+        access_token: this.jwtService.sign(payload),
+      };
+    } catch (error) {
       if (error.response.error === 'PRIMARY')
+        throw new ConflictException('The id is already registered');
+      throw new BadRequestException(
+        'The token is not available',
+        'BadRequestException',
+      );
+    }
+  }
+
+  async appleJoin(refresh_token: string, email: string) {
+    try {
+      const id = await this.appleTokenValidate(refresh_token);
+      return await this.usersService.createUser('a' + id, email);
+    } catch (error) {
+      console.log(error);
+      if (
+        error.response.error === 'PRIMARY' ||
+        error.response.statusCode === 403
+      )
         throw new ConflictException('The id is already registered');
       throw new BadRequestException(
         'The token is not available',
