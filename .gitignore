@@ -35,3 +35,4 @@ lerna-debug.log*
 /.env
 /src/auth/constants.ts
 /prisma/migrations
+/src/payments/constants.ts
