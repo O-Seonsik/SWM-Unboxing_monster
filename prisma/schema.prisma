@@ -74,6 +74,7 @@ model BoxPurchase{
 
 model Purchase {
     id              Int         @default(autoincrement())   @id
+    imp_uid         String
     owner           User        @relation(fields: [ownerId], references: [id])
     ownerId         String
     boxes           BoxPurchase[]

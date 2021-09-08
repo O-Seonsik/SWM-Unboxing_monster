@@ -6,5 +6,6 @@ import { PaymentsService } from './payments.service';
 @Module({
   imports: [HttpModule],
   providers: [PrismaService, PaymentsService],
+  exports: [PaymentsService, HttpModule],
 })
 export class PaymentsModule {}

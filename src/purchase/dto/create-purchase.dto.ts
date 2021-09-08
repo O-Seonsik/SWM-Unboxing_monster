@@ -16,6 +16,13 @@ export class CreatePurchaseDto {
   readonly ownerId: string;
 
   /**
+   * 결제시 발급받는 imp_uid
+   * @example imp_297510333741
+   */
+  @IsString()
+  readonly imp_uid: string;
+
+  /**
    * 총 구매한 가격
    * @example 20000
    */

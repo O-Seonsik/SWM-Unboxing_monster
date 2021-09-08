@@ -15,7 +15,7 @@ export class PaymentsService {
     private readonly prismaService: PrismaService,
   ) {}
 
-  async getToken(): Promise<string> {
+  private async getToken(): Promise<string> {
     const { imp_key, imp_secret } = impConfig;
     try {
       const res = await this.httpService
@@ -31,7 +31,7 @@ export class PaymentsService {
     }
   }
 
-  async getPaymentData(imp_uid: string): Promise<number> {
+  private async getPaymentData(imp_uid: string): Promise<number> {
     try {
       const accessToken = await this.getToken();
       const res = await this.httpService

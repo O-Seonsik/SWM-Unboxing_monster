@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -6,10 +7,14 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Purchase } from '@prisma/client';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
+import { PaymentsService } from '../payments/payments.service';
 
 @Injectable()
 export class PurchaseService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly paymentsService: PaymentsService,
+  ) {}
 
   async getPurchases(): Promise<Purchase[]> {
     return await this.prismaService.purchase.findMany();
@@ -69,12 +74,13 @@ export class PurchaseService {
   async createPurchase(body: CreatePurchaseDto): Promise<Purchase | any> {
     try {
       await this.checkPurchase(body.boxes);
-      const { ownerId, price, boxes } = body;
+      const { ownerId, price, boxes, imp_uid } = body;
       const purchase = await this.prismaService.purchase.create({
         data: {
           ownerId: ownerId,
           price: price,
           refundAt: null,
+          imp_uid: imp_uid,
         },
       });
 
@@ -111,6 +117,19 @@ export class PurchaseService {
         }),
       );
 
+      // 결제 내용 확인..
+      // payments의 checkForgery를 통해 제대로 된 결제가 진행되었는지 확인
+      const forgery = await this.paymentsService.checkForgery({
+        boxes: boxes,
+        imp_uid: imp_uid,
+      });
+
+      if (!forgery)
+        throw new BadRequestException(
+          'The payments amounts has been forgery',
+          'Please contact with payment manager',
+        );
+
       if (boxStorageList.length)
         await this.prismaService.boxStorage.createMany({
           data: boxStorageList,
@@ -125,7 +144,7 @@ export class PurchaseService {
         throw new NotFoundException(
           `The ${error.meta.field_name} doesn't exist in our service`,
         );
-      return error;
+      throw error;
     }
   }
 
