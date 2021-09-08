@@ -74,10 +74,11 @@ export class PurchaseService {
   async createPurchase(body: CreatePurchaseDto): Promise<Purchase | any> {
     try {
       await this.checkPurchase(body.boxes);
-      const { ownerId, price, boxes, imp_uid } = body;
+      const { ownerId, price, boxes, imp_uid, merchant_uid } = body;
       const purchase = await this.prismaService.purchase.create({
         data: {
           ownerId: ownerId,
+          id: merchant_uid,
           price: price,
           refundAt: null,
           imp_uid: imp_uid,

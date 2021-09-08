@@ -68,12 +68,12 @@ model BoxPurchase{
     box         Box         @relation(fields: [boxId], references: [id])
     boxId       Int
     purchase    Purchase    @relation(fields: [purchaseId], references: [id])
-    purchaseId  Int
+    purchaseId  String
     count       Int?
 }
 
 model Purchase {
-    id              Int         @default(autoincrement())   @id
+    id              String      @id
     imp_uid         String
     owner           User        @relation(fields: [ownerId], references: [id])
     ownerId         String

@@ -16,6 +16,14 @@ export class CreatePurchaseDto {
   readonly ownerId: string;
 
   /**
+   * 결제시 발급하는 merchant_uid(unique)
+   * user_id+unix_time
+   * @example k14321423423412321631083957
+   */
+  @IsString()
+  readonly merchant_uid: string;
+
+  /**
    * 결제시 발급받는 imp_uid
    * @example imp_297510333741
    */
