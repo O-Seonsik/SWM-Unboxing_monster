@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -44,12 +45,19 @@ export class PaymentsService {
           headers: { Authorization: accessToken },
         })
         .toPromise();
+      console.log(res.data.response.cancel_history.length);
+      if (res.data.response.cancel_history.length)
+        throw new ConflictException(
+          '이미 환불된 결제입니다.',
+          'Conflict exception',
+        );
       return {
         amount: res.data.response.amount,
         merchant_uid: res.data.response.merchant_uid,
       };
     } catch (error) {
       if (error.status === 401) throw error;
+      else if (error.status === 409) throw error;
       else
         throw new UnauthorizedException('인증 실패', '토큰값이 올바르지 않음');
     }
