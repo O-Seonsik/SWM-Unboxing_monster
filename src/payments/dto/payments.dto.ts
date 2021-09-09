@@ -9,6 +9,12 @@ import { Type } from 'class-transformer';
 
 export class PaymentsDto {
   /**
+   * 아임포트 결제시 발급한 merchant_uid
+   * @example a1.123123124.432fds090fa@.1651423923
+   */
+  @IsString()
+  readonly merchant_uid: string;
+  /**
    * 아임포트 결제시 발급받은 uid
    * @example imp_218715498371
    */

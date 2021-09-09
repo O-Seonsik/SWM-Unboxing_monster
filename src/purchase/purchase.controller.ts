@@ -20,7 +20,7 @@ export class PurchaseController {
   }
 
   @Get(':id')
-  async getPurchase(@Param('id') id: number): Promise<Purchase> {
+  async getPurchase(@Param('id') id: string): Promise<Purchase> {
     return await this.purchaseService.getPurchase({ id: id });
   }
 
@@ -30,7 +30,7 @@ export class PurchaseController {
   }
 
   @Patch(':id')
-  async refundPurchase(@Param('id') id: number): Promise<Purchase> {
+  async refundPurchase(@Param('id') id: string): Promise<Purchase> {
     return await this.purchaseService.refundPurchase({ id: id });
   }
 }

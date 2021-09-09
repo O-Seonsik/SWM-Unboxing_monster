@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -31,7 +32,9 @@ export class PaymentsService {
     }
   }
 
-  private async getPaymentData(imp_uid: string): Promise<number> {
+  private async getPaymentData(
+    imp_uid: string,
+  ): Promise<{ amount: number; merchant_uid: string }> {
     try {
       const accessToken = await this.getToken();
       const res = await this.httpService
@@ -39,7 +42,10 @@ export class PaymentsService {
           headers: { Authorization: accessToken },
         })
         .toPromise();
-      return res.data.response.amount;
+      return {
+        amount: res.data.response.amount,
+        merchant_uid: res.data.response.merchant_uid,
+      };
     } catch (error) {
       if (error.status === 401) throw error;
       else
@@ -48,10 +54,16 @@ export class PaymentsService {
   }
 
   async checkForgery(data: PaymentsDto): Promise<boolean> {
-    const { boxes, imp_uid } = data;
+    const { boxes, imp_uid, merchant_uid } = data;
+    const serverData = await this.getPaymentData(imp_uid);
+    if (serverData.merchant_uid !== merchant_uid)
+      throw new BadRequestException(
+        'merchant_uid 가 일치하지 않음',
+        'merchant_uid 가 일치하지 않음',
+      );
     try {
       const amounts = {
-        server: await this.getPaymentData(imp_uid),
+        server: serverData.amount,
         client: 0,
       };
 

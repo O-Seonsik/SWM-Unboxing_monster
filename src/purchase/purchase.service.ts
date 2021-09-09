@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -25,6 +26,7 @@ export class PurchaseService {
   ): Promise<Purchase[]> {
     return await this.prismaService.purchase.findMany({
       where: purchaseWhereInput,
+      include: { owner: true, boxes: { include: { box: true } } },
     });
   }
 
@@ -74,6 +76,7 @@ export class PurchaseService {
   async createPurchase(body: CreatePurchaseDto): Promise<Purchase | any> {
     try {
       await this.checkPurchase(body.boxes);
+
       const { ownerId, price, boxes, imp_uid, merchant_uid } = body;
       const purchase = await this.prismaService.purchase.create({
         data: {
@@ -97,30 +100,10 @@ export class PurchaseService {
       // @ts-ignore
       await this.createBoxPurchase(boxPurchase);
 
-      const boxStorageList = await Promise.all(
-        body.boxes.map(async (box) => {
-          const boxCheck = await this.prismaService.boxStorage.findFirst({
-            where: { boxId: box.boxId, ownerId: 'k1804801727' },
-          });
-          if (boxCheck)
-            await this.prismaService.boxStorage.update({
-              where: { id: boxCheck.id },
-              data: {
-                count: boxCheck.count + box.count,
-              },
-            });
-          else
-            return {
-              ownerId: ownerId,
-              boxId: box.boxId,
-              count: box.count,
-            };
-        }),
-      );
-
       // 결제 내용 확인..
       // payments의 checkForgery를 통해 제대로 된 결제가 진행되었는지 확인
       const forgery = await this.paymentsService.checkForgery({
+        merchant_uid: merchant_uid,
         boxes: boxes,
         imp_uid: imp_uid,
       });
@@ -130,6 +113,28 @@ export class PurchaseService {
           'The payments amounts has been forgery',
           'Please contact with payment manager',
         );
+
+      const boxStorageList = await Promise.all(
+        body.boxes.map(async (box) => {
+          const boxCheck = await this.prismaService.boxStorage.findFirst({
+            where: { boxId: box.boxId, ownerId: ownerId },
+          });
+          console.log(boxCheck);
+          if (boxCheck) {
+            await this.prismaService.boxStorage.update({
+              where: { id: boxCheck.id },
+              data: {
+                count: boxCheck.count + box.count,
+              },
+            });
+          } else
+            return {
+              ownerId: ownerId,
+              boxId: box.boxId,
+              count: box.count,
+            };
+        }),
+      );
 
       if (boxStorageList.length)
         await this.prismaService.boxStorage.createMany({
@@ -141,6 +146,11 @@ export class PurchaseService {
         include: { owner: true },
       });
     } catch (error) {
+      if (error.code === 'P2002')
+        throw new ConflictException(
+          'This request has already been completed.',
+          'Conflict Exception',
+        );
       if (error.code === 'P2003')
         throw new NotFoundException(
           `The ${error.meta.field_name} doesn't exist in our service`,
