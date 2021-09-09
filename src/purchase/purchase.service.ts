@@ -120,6 +120,16 @@ export class PurchaseService {
           const boxCheck = await this.prismaService.boxStorage.findFirst({
             where: { boxId: box.boxId, ownerId: ownerId },
           });
+
+          await this.prismaService.box.update({
+            where: { id: box.boxId },
+            data: {
+              sales: {
+                increment: box.count,
+              },
+            },
+          });
+
           if (boxCheck) {
             await this.prismaService.boxStorage.update({
               where: { id: boxCheck.id },
