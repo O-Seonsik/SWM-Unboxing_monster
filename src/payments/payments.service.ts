@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -8,6 +9,7 @@ import { PaymentsDto } from './dto/payments.dto';
 import { HttpService } from '@nestjs/axios';
 import { impConfig } from './constants';
 import { PrismaService } from '../prisma/prisma.service';
+import { RefundDto } from './dto/refund.dto';
 
 @Injectable()
 export class PaymentsService {
@@ -80,6 +82,31 @@ export class PaymentsService {
       return client === server;
     } catch (error) {
       throw new NotFoundException('Not found exception', '찾을 수 없는 Box Id');
+    }
+  }
+
+  async refund(data: RefundDto): Promise<boolean> {
+    const { imp_uid, checksum } = data;
+    try {
+      const accessToken = await this.getToken();
+      const res = await this.httpService
+        .post(
+          'https://api.iamport.kr/payments/cancel',
+          {
+            imp_uid: imp_uid,
+            checksum: checksum,
+          },
+          {
+            headers: { Authorization: accessToken },
+          },
+        )
+        .toPromise();
+      return res.data.code !== 1;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        '결제 서버 오류',
+        'Internal server exception',
+      );
     }
   }
 }

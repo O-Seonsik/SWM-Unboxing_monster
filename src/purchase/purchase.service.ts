@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Purchase } from '@prisma/client';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { PaymentsService } from '../payments/payments.service';
+import { RefundDto } from '../payments/dto/refund.dto';
 
 @Injectable()
 export class PurchaseService {
@@ -119,7 +120,6 @@ export class PurchaseService {
           const boxCheck = await this.prismaService.boxStorage.findFirst({
             where: { boxId: box.boxId, ownerId: ownerId },
           });
-          console.log(boxCheck);
           if (boxCheck) {
             await this.prismaService.boxStorage.update({
               where: { id: boxCheck.id },
@@ -143,7 +143,7 @@ export class PurchaseService {
 
       return await this.prismaService.purchase.findUnique({
         where: { id: purchase.id },
-        include: { owner: true },
+        include: { owner: true, boxes: true },
       });
     } catch (error) {
       if (error.code === 'P2002')
@@ -176,31 +176,69 @@ export class PurchaseService {
     }
   }
 
-  async refundPurchase(
-    purchaseWhereUniqueInput: Prisma.PurchaseWhereUniqueInput,
-  ): Promise<Purchase> {
-    const purchase = await this.prismaService.purchase.findUnique({
-      where: purchaseWhereUniqueInput,
-    });
-    if (purchase.refundAt)
-      throw new ForbiddenException(
-        'Forbidden Error',
-        'Already refund this purchase.',
-      );
+  async refundPurchase(data: RefundDto): Promise<Purchase> {
+    const { merchant_uid, ownerId } = data;
     try {
-      return await this.prismaService.purchase.update({
-        where: purchaseWhereUniqueInput,
+      const purchase = await this.prismaService.purchase.findUnique({
+        where: { id: merchant_uid },
+        include: { boxes: true },
+      });
+      if (!purchase)
+        throw new NotFoundException(
+          'merchant_uid 가 존재하지 않습니다.',
+          'Not found exception',
+        );
+
+      if (purchase.refund)
+        throw new ConflictException(
+          '이미 환불된 내역입니다.',
+          'Conflict exception',
+        );
+
+      await Promise.all(
+        purchase.boxes.map(async (box) => {
+          const userBoxCount = await this.prismaService.boxStorage.findFirst({
+            where: { boxId: box.boxId, ownerId: ownerId },
+          });
+          if (userBoxCount.count < box.count)
+            throw new ConflictException(
+              '환불 대상 박스를 이미 사용했습니다.',
+              'Conflict Exception',
+            );
+        }),
+      );
+
+      const refund = await this.paymentsService.refund(data);
+      if (!refund)
+        throw new BadRequestException(
+          'imp_uid 혹은 checksum이 올바르지 않습니다.',
+          'Bad request exception',
+        );
+
+      const purchaseResult = await this.prismaService.purchase.update({
+        where: { id: merchant_uid },
         data: {
           refund: true,
           refundAt: new Date(),
         },
       });
+
+      await Promise.all(
+        purchase.boxes.map(async (box) => {
+          await this.prismaService.boxStorage.updateMany({
+            where: { boxId: box.boxId, ownerId: ownerId },
+            data: {
+              count: {
+                decrement: box.count,
+              },
+            },
+          });
+        }),
+      );
+
+      return purchaseResult;
     } catch (error) {
-      if (error.code === 'P2025')
-        throw new NotFoundException(error.code, error.meta.cause);
-      if (error.code === 'P2002')
-        throw new ForbiddenException(error.code, error.meta.cause);
-      return error;
+      throw error;
     }
   }
 }
