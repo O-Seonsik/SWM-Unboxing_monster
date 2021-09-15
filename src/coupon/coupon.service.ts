@@ -30,13 +30,17 @@ export class CouponService {
 
   async createCoupon(body: CreateCouponDto): Promise<Coupon> {
     try {
-      const { ownerId, itemId, qr } = body;
+      const { ownerId, itemId } = body;
+      const now = new Date();
+      const expiration = new Date(now);
+      expiration.setDate(now.getDate() + 14);
+
       return await this.prismaService.coupon.create({
         data: {
           ownerId: ownerId,
           itemId: itemId,
-          qr: qr,
-          isUse: false,
+          createAt: now.toString(),
+          Expiration: expiration.toString(),
         },
       });
     } catch (error) {
@@ -55,7 +59,7 @@ export class CouponService {
       return await this.prismaService.coupon.update({
         where: couponWhereUniqueInput,
         data: {
-          isUse: true,
+          isUsed: true,
         },
       });
     } catch (error) {

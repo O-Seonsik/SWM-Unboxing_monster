@@ -11,6 +11,7 @@ import { CreateBoxDto } from './dto/create-box.dto';
 import { HttpService } from '@nestjs/axios';
 import { UsersService } from '../users/users.service';
 import { OpenResultService } from '../open-result/open-result.service';
+import { CouponService } from '../coupon/coupon.service';
 
 @Injectable()
 export class BoxService {
@@ -19,6 +20,7 @@ export class BoxService {
     private readonly httpService: HttpService,
     private readonly usersService: UsersService,
     private readonly openResultService: OpenResultService,
+    private readonly couponService: CouponService,
   ) {}
 
   async getBoxes(): Promise<Box[]> {
@@ -154,6 +156,7 @@ export class BoxService {
           await this.openResultService.createOpenResult(id, userId, itemId);
         });
 
+        // 박스 사용 처리
         if (targetBox.count - count) {
           await this.prismaService.boxStorage.update({
             where: { id: targetBox.id },
@@ -164,9 +167,20 @@ export class BoxService {
             where: { id: targetBox.id },
           });
         }
-        return {
-          result: result,
-        };
+
+        // 여기서 쿠폰에 아이템 넣어주기
+        return await Promise.all(
+          result.map(async (item) => {
+            try {
+              return await this.couponService.createCoupon({
+                ownerId: userId,
+                itemId: item,
+              });
+            } catch (error) {
+              console.log(error);
+            }
+          }),
+        );
       } catch (error) {
         return new InternalServerErrorException(
           'Opening server error',

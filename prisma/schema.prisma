@@ -93,13 +93,16 @@ model Notice {
 }
 
 model Coupon {
-    id      Int     @default(autoincrement())   @id
-    owner   User    @relation(fields: [ownerId], references: [id])
-    ownerId String
-    item    Item    @relation(fields: [itemId], references: [id])
-    itemId  Int
-    qr      String
-    isUse   Boolean
+    id          Int         @default(autoincrement())   @id
+    owner       User        @relation(fields: [ownerId], references: [id])
+    ownerId     String
+    item        Item        @relation(fields: [itemId], references: [id])
+    itemId      Int
+    isUsed      Boolean     @default(false)
+    createAt    String
+    refund      Boolean     @default(false)
+    refundAt    String?
+    Expiration  String
 }
 
 model BoxStorage {

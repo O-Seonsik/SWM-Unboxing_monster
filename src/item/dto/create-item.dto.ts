@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString, IsUrl } from 'class-validator';
 
 export class CreateItemDto {
   /**
@@ -25,7 +25,7 @@ export class CreateItemDto {
    * 상품가격
    * @example '860'
    */
-  @IsNumber()
+  @IsUrl()
   readonly price: number;
   /**
    * 상품 대표 이미지 url

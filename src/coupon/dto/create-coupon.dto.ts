@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsUrl } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class CreateCouponDto {
   /**
@@ -14,11 +14,4 @@ export class CreateCouponDto {
    */
   @IsNumber()
   readonly itemId: number;
-
-  /**
-   * 상품 QR URL
-   * @example 1242321
-   */
-  @IsUrl()
-  readonly qr: string;
 }
