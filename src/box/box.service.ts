@@ -98,11 +98,7 @@ export class BoxService {
     }
   }
 
-  async getBoxOpen(
-    id: number,
-    count: number,
-    userId = 'k1804801727',
-  ): Promise<any> {
+  async getBoxOpen(id: number, count: number, userId: string): Promise<any> {
     try {
       const userBoxes: any = await this.usersService.getUser({ id: userId });
       const targetBox = userBoxes.boxStorage.filter(

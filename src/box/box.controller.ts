@@ -10,15 +10,18 @@ import {
   Post,
   Query,
   Req,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Box } from '@prisma/client';
 import { CreateBoxDto } from './dto/create-box.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UpdateBoxDto } from './dto/update-box.dto';
 import { BoxEntity } from './entities/box.entity';
 import { BoxService } from './box.service';
 import { CustomBoxDto } from './dto/custom-box.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Box')
 @Controller('box')
@@ -55,9 +58,15 @@ export class BoxController {
     return await this.boxService.searchBoxes(keyword);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get('open/:id')
-  async getBoxOpen(@Param('id') id: number, @Query() q) {
-    return await this.boxService.getBoxOpen(id, q.count ? +q.count : 1);
+  async getBoxOpen(@Param('id') id: number, @Query() q, @Request() req) {
+    return await this.boxService.getBoxOpen(
+      id,
+      q.count ? +q.count : 1,
+      req.user.userId,
+    );
   }
 
   @Get(':id')

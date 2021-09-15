@@ -38,13 +38,15 @@ model Box {
 }
 
 model Item {
-    id      Int     @default(autoincrement()) @id
-    title   String
-    price   Int
-    image   String
-    detail  String
-    boxes   BoxItem[]
-    coupon  Coupon[]
+    id          Int     @default(autoincrement()) @id
+    productId   String
+    seller      Int
+    title       String
+    price       Int
+    image       String
+    detail      String
+    boxes       BoxItem[]
+    coupon      Coupon[]
     openResult  OpenResult[]
 }
 
