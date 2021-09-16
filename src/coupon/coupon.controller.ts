@@ -6,11 +6,16 @@ import {
   Param,
   Patch,
   Post,
+  Query,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { CouponService } from './coupon.service';
 import { Coupon } from '@prisma/client';
 import { CreateCouponDto } from './dto/create-coupon.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RefundCouponDto } from './dto/refund-coupon.dto';
 
 @ApiTags('coupon')
 @Controller('coupon')
@@ -22,6 +27,38 @@ export class CouponController {
     return await this.couponService.getCoupons();
   }
 
+  @ApiOperation({ summary: '쿠폰 사용' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('confirm/:couponId')
+  async confirmCoupon(
+    @Request() req,
+    @Param('couponId') couponId: number,
+    @Query() q: RefundCouponDto,
+  ): Promise<Coupon> {
+    return await this.couponService.confirmCoupon(
+      req.user.userId,
+      couponId,
+      q.phone,
+    );
+  }
+
+  @ApiOperation({ summary: '쿠폰 환불' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch('refund/:couponId')
+  async refundCoupon(
+    @Request() req,
+    @Param('couponId') couponId: number,
+  ): Promise<Coupon> {
+    return await this.couponService.refundCoupon(req.user.userId, couponId);
+  }
+
+  @Patch('use/:id')
+  async useCoupon(@Param('id') id: number): Promise<Coupon> {
+    return await this.couponService.useCoupon({ id: id });
+  }
+
   @Get(':id')
   async getUserCoupon(@Param('id') id: string): Promise<Coupon[]> {
     return await this.couponService.getUserCoupon({ ownerId: id });
@@ -30,11 +67,6 @@ export class CouponController {
   @Post()
   async createCoupon(@Body() body: CreateCouponDto): Promise<Coupon> {
     return await this.couponService.createCoupon(body);
-  }
-
-  @Patch('use/:id')
-  async useCoupon(@Param('id') id: number): Promise<Coupon> {
-    return await this.couponService.useCoupon({ id: id });
   }
 
   @Delete(':id')

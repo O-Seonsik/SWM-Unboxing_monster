@@ -12,10 +12,10 @@ export class UsersService {
 
   async getUser(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-  ): Promise<User | null> {
+  ): Promise<User> {
     return this.prisma.user.findUnique({
       where: userWhereUniqueInput,
-      include: { boxStorage: true },
+      include: { boxStorage: true, coupon: true },
     });
   }
 

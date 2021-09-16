@@ -6,6 +6,7 @@ import { HttpModule } from '@nestjs/axios';
 import { UsersService } from '../users/users.service';
 import { OpenResultService } from '../open-result/open-result.service';
 import { CouponService } from '../coupon/coupon.service';
+import { ItemService } from '../item/item.service';
 
 @Module({
   imports: [HttpModule],
@@ -16,6 +17,7 @@ import { CouponService } from '../coupon/coupon.service';
     UsersService,
     OpenResultService,
     CouponService,
+    ItemService,
   ],
 })
 export class BoxModule {}

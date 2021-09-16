@@ -36,3 +36,4 @@ lerna-debug.log*
 /src/auth/constants.ts
 /prisma/migrations
 /src/payments/constants.ts
+/src/coupon/constants.ts
