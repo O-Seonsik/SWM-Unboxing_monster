@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsString } from 'class-validator';
 
 export class CreateBoxDto {
   /**
@@ -29,6 +29,12 @@ export class CreateBoxDto {
   @IsString()
   readonly image: string;
 
+  /**
+   * 대상 이미지의 위치가 로컬이면 True
+   * @example true
+   */
+  @IsBoolean()
+  readonly isLocal: boolean;
   /**
    * 박스 세부 설명
    * @example '한우 박스입니다. 풀내음이 가득한 박스지요!'

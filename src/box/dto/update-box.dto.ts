@@ -1,6 +1,6 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { CreateBoxDto } from './create-box.dto';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateBoxDto extends PartialType(CreateBoxDto) {
   /**
@@ -25,12 +25,21 @@ export class UpdateBoxDto extends PartialType(CreateBoxDto) {
    */
   @IsOptional()
   @IsString()
-  readonly image: string;
+  readonly image?: string;
+
+  /**
+   * 대상 이미지의 위치가 로컬이면 True
+   * @example true
+   */
+  @IsOptional()
+  @IsBoolean()
+  readonly isLocal?: boolean;
 
   /**
    * 박스 세부 설명
    * @example '한우 박스입니다. 풀내음이 가득한 박스지요!'
    */
+  @IsOptional()
   @IsString()
-  readonly detail: string;
+  readonly detail?: string;
 }
