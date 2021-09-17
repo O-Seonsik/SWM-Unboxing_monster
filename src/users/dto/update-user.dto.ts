@@ -7,8 +7,9 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
    * User's email
    * @example "email@mail.com"
    */
+  @IsOptional()
   @IsEmail()
-  readonly email: string;
+  readonly email?: string;
   /**
    * Points that users have
    * @example 5000
@@ -16,4 +17,8 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsNumber()
   @IsOptional()
   readonly point?: number;
+
+  @IsNumber()
+  @IsOptional()
+  readonly nickname?: string;
 }

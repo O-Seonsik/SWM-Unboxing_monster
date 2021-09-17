@@ -13,4 +13,11 @@ export class CreateUserDto {
    */
   @IsString()
   readonly id: string;
+
+  /**
+   * User's nickname
+   * @example "왕자"
+   */
+  @IsString()
+  readonly nickname: string;
 }

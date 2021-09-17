@@ -30,7 +30,7 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() user: CreateUserDto): Promise<UsersEntity> {
-    return this.usersService.createUser(user.id, user.email);
+    return this.usersService.createUser(user.id, user.email, user.nickname);
   }
 
   @Patch(':id')
@@ -43,6 +43,7 @@ export class UsersController {
       data: {
         email: body.email,
         point: body.point,
+        nickname: body.nickname,
       },
     });
   }
