@@ -13,6 +13,7 @@ generator client {
 
 model User {
     id          String  @id
+    nickname    String  @unique
     email       String  @unique
     point       Int     @default(0)
     box         Box[]

@@ -1,4 +1,4 @@
-import { IsEmail } from 'class-validator';
+import { IsEmail, IsString } from 'class-validator';
 
 export class JoinUnboxingDto {
   /**
@@ -7,4 +7,11 @@ export class JoinUnboxingDto {
    */
   @IsEmail()
   readonly email: string;
+
+  /**
+   * 유저의 닉네임
+   * @example '왕자'
+   */
+  @IsString()
+  readonly nickname: string;
 }

@@ -23,11 +23,12 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
-  async createUser(id: string, email: string) {
+  async createUser(id: string, email: string, nickname: string) {
     try {
       const data: Prisma.UserCreateInput = {
         id: id,
         email: email,
+        nickname: nickname,
       };
 
       return await this.prisma.user.create({ data });

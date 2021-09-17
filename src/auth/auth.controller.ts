@@ -34,14 +34,23 @@ export class AuthController {
         'Unauthorized',
       );
     if (co === 'kakao')
-      return await this.authService.kakaoJoin(token.split(' ')[1], body.email);
+      return await this.authService.kakaoJoin(
+        token.split(' ')[1],
+        body.email,
+        body.nickname,
+      );
     else if (co === 'facebook')
       return await this.authService.facebookJoin(
         token.split(' ')[1],
         body.email,
+        body.nickname,
       );
     else if (co === 'apple')
-      return await this.authService.appleJoin(token.split(' ')[1], body.email);
+      return await this.authService.appleJoin(
+        token.split(' ')[1],
+        body.email,
+        body.nickname,
+      );
     else throw new BadRequestException(`${co} is not supported service`);
   }
 

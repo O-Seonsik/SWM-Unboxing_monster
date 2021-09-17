@@ -47,7 +47,7 @@ export class AuthService {
     }
   }
 
-  async kakaoJoin(token: string, email: string) {
+  async kakaoJoin(token: string, email: string, nickname: string) {
     try {
       const userInfo = await this.httpService
         .get('https://kapi.kakao.com/v2/user/me', {
@@ -56,7 +56,7 @@ export class AuthService {
         .toPromise();
       const id = userInfo.data.id;
       if (!id) throw new BadRequestException();
-      return await this.usersService.createUser('k' + id, email);
+      return await this.usersService.createUser('k' + id, email, nickname);
     } catch (error) {
       if (
         error.response.error === 'PRIMARY' ||
@@ -113,7 +113,7 @@ export class AuthService {
     }
   }
 
-  async facebookJoin(token: string, email: string) {
+  async facebookJoin(token: string, email: string, nickname: string) {
     try {
       const access_token = await this.getFbAccessToken();
       const userInfo = await this.httpService
@@ -123,7 +123,7 @@ export class AuthService {
         .toPromise();
       const id = userInfo.data.data.user_id;
       if (!id) throw new BadRequestException();
-      return await this.usersService.createUser('f' + id, email);
+      return await this.usersService.createUser('f' + id, email, nickname);
     } catch (error) {
       if (
         error.response.error === 'PRIMARY' ||
@@ -215,10 +215,10 @@ export class AuthService {
     }
   }
 
-  async appleJoin(refresh_token: string, email: string) {
+  async appleJoin(refresh_token: string, email: string, nickname: string) {
     try {
       const id = await this.appleTokenValidate(refresh_token);
-      return await this.usersService.createUser('a' + id, email);
+      return await this.usersService.createUser('a' + id, email, nickname);
     } catch (error) {
       console.log(error);
       if (
