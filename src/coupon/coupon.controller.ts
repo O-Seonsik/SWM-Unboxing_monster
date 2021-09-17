@@ -15,7 +15,7 @@ import { Coupon } from '@prisma/client';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RefundCouponDto } from './dto/refund-coupon.dto';
+import { ConfirmCouponDto } from './dto/confirm-coupon.dto';
 
 @ApiTags('coupon')
 @Controller('coupon')
@@ -34,7 +34,7 @@ export class CouponController {
   async confirmCoupon(
     @Request() req,
     @Param('couponId') couponId: number,
-    @Query() q: RefundCouponDto,
+    @Query() q: ConfirmCouponDto,
   ): Promise<Coupon> {
     return await this.couponService.confirmCoupon(
       req.user.userId,
