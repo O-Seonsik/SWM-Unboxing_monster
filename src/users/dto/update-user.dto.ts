@@ -10,6 +10,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
   @IsEmail()
   readonly email?: string;
+
   /**
    * Points that users have
    * @example 5000
@@ -18,6 +19,10 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsOptional()
   readonly point?: number;
 
+  /**
+   * 사용자의 닉네임
+   * @example 왕자
+   */
   @IsNumber()
   @IsOptional()
   readonly nickname?: string;
