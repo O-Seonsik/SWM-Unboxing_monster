@@ -186,7 +186,7 @@ export class AuthService {
 
       const jwtClaims = await verifyAppleToken({
         idToken: response.data.id_token,
-        clientId: 'com.unboxing.service',
+        clientId: appleConfig.client_id,
       });
       return jwtClaims.sub;
     } catch (error) {

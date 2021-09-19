@@ -26,7 +26,7 @@ export class CreateItemDto {
    * 상품가격
    * @example '860'
    */
-  @IsString()
+  @IsNumber()
   readonly price: number;
 
   /**
