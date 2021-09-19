@@ -3,43 +3,37 @@ import {
   Controller,
   Delete,
   Get,
-  Param,
   Patch,
-  Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UsersEntity } from './entities/users.entity';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Get(':id')
-  async getUser(@Param('id') id: string): Promise<UsersEntity> {
-    return this.usersService.getUser({ id: id });
-  }
-
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Get()
-  async getUsers(): Promise<UsersEntity[]> {
-    return this.usersService.getUsers();
+  async getUser(@Request() req): Promise<UsersEntity> {
+    return this.usersService.getUser({ id: req.user.userId });
   }
 
-  @Post()
-  async createUser(@Body() user: CreateUserDto): Promise<UsersEntity> {
-    return this.usersService.createUser(user.id, user.email, user.nickname);
-  }
-
-  @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch()
   async updateUser(
     @Body() body: UpdateUserDto,
-    @Param('id') id: string,
+    @Request() req,
   ): Promise<UsersEntity> {
     return this.usersService.updateUser({
-      where: { id: id },
+      where: { id: req.user.userId },
       data: {
         email: body.email,
         point: body.point,
@@ -48,8 +42,10 @@ export class UsersController {
     });
   }
 
-  @Delete(':id')
-  async deleteUser(@Param('id') id: string) {
-    return this.usersService.deleteUser({ id: id });
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  async deleteUser(@Request() req) {
+    return this.usersService.deleteUser({ id: req.user.userId });
   }
 }
