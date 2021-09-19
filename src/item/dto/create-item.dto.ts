@@ -21,18 +21,21 @@ export class CreateItemDto {
    */
   @IsString()
   readonly title: string;
+
   /**
    * 상품가격
    * @example '860'
    */
-  @IsUrl()
+  @IsString()
   readonly price: number;
+
   /**
    * 상품 대표 이미지 url
    * @example https://www.officecon.co.kr/common/file/download?uploadFullPath=/product/20210830/20210830175629_49ef3474-8150-4271-8aba-93e769a9c8f7_V.png
    */
-  @IsString()
+  @IsUrl()
   readonly image: string;
+
   /**
    * 상품 세부 설명
    * @example 농심)신라면(봉지)
