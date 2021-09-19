@@ -16,13 +16,6 @@ export class CreateBoxDto {
   readonly price: number;
 
   /**
-   * 박스 제작자 id(key)
-   * @example 'k1804801727'
-   */
-  @IsString()
-  readonly ownerId: string;
-
-  /**
    * 박스 대표 이미지 url
    * @example 'https://test.com/resource/test.png
    */
@@ -35,10 +28,18 @@ export class CreateBoxDto {
    */
   @IsBoolean()
   readonly isLocal: boolean;
+
   /**
    * 박스 세부 설명
    * @example '한우 박스입니다. 풀내음이 가득한 박스지요!'
    */
   @IsString()
   readonly detail: string;
+
+  /**
+   * 박스에 담을 아이템 리스트
+   * [1, 2, 3]
+   */
+  @IsNumber({}, { each: true })
+  readonly boxItems: number[];
 }

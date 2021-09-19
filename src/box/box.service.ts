@@ -23,8 +23,22 @@ export class BoxService {
     private readonly couponService: CouponService,
   ) {}
 
-  async getBoxes(): Promise<Box[]> {
-    return await this.prismaService.box.findMany();
+  async getBoxes(skip: number, take: number): Promise<Box[]> {
+    return await this.prismaService.box.findMany({
+      skip: skip,
+      take: take,
+      where: {
+        isManager: true,
+      },
+    });
+  }
+
+  async getUserBox(id: string, skip: number, take: number): Promise<Box[]> {
+    return await this.prismaService.box.findMany({
+      skip: skip,
+      take: take,
+      where: { ownerId: id },
+    });
   }
 
   async getBox(
@@ -62,9 +76,34 @@ export class BoxService {
       },
     });
   }
-  async createBox(box: CreateBoxDto): Promise<Box> {
+
+  async createBox(box: CreateBoxDto, user: string): Promise<Box> {
     try {
-      return await this.prismaService.box.create({ data: box });
+      const { title, price, image, isLocal, detail, boxItems } = box;
+
+      // 박스 생성
+      const result = await this.prismaService.box.create({
+        data: {
+          title: title,
+          price: price,
+          image: image,
+          isLocal: isLocal,
+          detail: detail,
+          ownerId: user,
+        },
+      });
+
+      // 박스에 담을 아이템 객체 생성
+      const data = boxItems.map((item) => {
+        return {
+          boxId: result.id,
+          itemId: item,
+        };
+      });
+
+      // 박스에 아이템 담기
+      await this.prismaService.boxItem.createMany({ data: data });
+      return result;
     } catch (e) {
       if (e.code === 'P2003')
         throw new NotFoundException("The ownerId doesn't exist in our service");
@@ -72,24 +111,14 @@ export class BoxService {
     }
   }
 
-  async updateBox(params: {
-    where: Prisma.BoxWhereUniqueInput;
-    data: Prisma.BoxUpdateInput;
-  }): Promise<Box> {
-    const { where, data } = params;
+  async deleteBox(id: number, userId: string): Promise<Box> {
     try {
-      return await this.prismaService.box.update({ where, data });
-    } catch (error) {
-      if (error.code === 'P2025')
-        throw new NotFoundException(error.code, error.meta.cause);
-      if (error.code === 'P2002')
-        throw new ForbiddenException(error.code, error.meta.target);
-      return error;
-    }
-  }
-
-  async deleteBox(id: number): Promise<Box> {
-    try {
+      const box = await this.getBox({ id: id });
+      if (box.ownerId !== userId)
+        throw new ForbiddenException(
+          '해당 박스에 권한이 없습니다.',
+          'Forbidden error',
+        );
       return await this.prismaService.box.delete({ where: { id: id } });
     } catch (error) {
       if (error.code === 'P2025')
