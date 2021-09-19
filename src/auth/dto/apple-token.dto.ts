@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class AppleTokenDto {
   /**
@@ -7,4 +7,12 @@ export class AppleTokenDto {
    */
   @IsString()
   readonly code: string;
+
+  /**
+   * 안드로이드인 경우 true
+   * @example true
+   */
+  @IsOptional()
+  @IsBoolean()
+  readonly isAndroid?: boolean;
 }

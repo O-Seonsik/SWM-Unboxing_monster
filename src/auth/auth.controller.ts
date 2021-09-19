@@ -51,6 +51,13 @@ export class AuthController {
         body.email,
         body.nickname,
       );
+    else if (co === 'apple-a')
+      return await this.authService.appleJoin(
+        token.split(' ')[1],
+        body.email,
+        body.nickname,
+        true,
+      );
     else throw new BadRequestException(`${co} is not supported service`);
   }
 
@@ -72,11 +79,13 @@ export class AuthController {
       return await this.authService.facebookLogin(token.split(' ')[1]);
     else if (co === 'apple')
       return await this.authService.appleLogin(token.split(' ')[1]);
+    else if (co === 'apple-a')
+      return await this.authService.appleLogin(token.split(' ')[1], true);
     else throw new BadRequestException(`${co} is not supported service`);
   }
 
   @Get('token/apple')
   async getAppleToken(@Query() q: AppleTokenDto) {
-    return this.authService.getAppleToken(q.code);
+    return this.authService.getAppleToken(q);
   }
 }

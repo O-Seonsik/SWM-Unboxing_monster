@@ -11,6 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { fbConfig, appleConfig } from './constants';
 import { createClientSecret } from 'apple-id-client-secret';
 import verifyAppleToken from 'verify-apple-id-token';
+import { AppleTokenDto } from './dto/apple-token.dto';
 
 @Injectable()
 export class AuthService {
@@ -137,43 +138,48 @@ export class AuthService {
     }
   }
 
-  async getAppleToken(code: string) {
+  async getAppleToken(q: AppleTokenDto) {
+    const clientId = q.isAndroid ? appleConfig.android : appleConfig.client_id;
+
     const clientSecret = createClientSecret({
       keyId: appleConfig.keyId,
-      bundleId: appleConfig.bundleId,
+      bundleId: clientId,
       teamId: appleConfig.teamId,
       privateKey: appleConfig.privateKey,
     });
 
     const data = new URLSearchParams();
 
-    data.append('client_id', appleConfig.client_id);
+    data.append('client_id', clientId);
     data.append('grant_type', 'authorization_code');
     data.append('client_secret', clientSecret);
     data.append('redirect_uri', appleConfig.redirect_uri);
-    data.append('code', code);
+    data.append('code', q.code);
 
     try {
       const response = await this.httpService
         .post('https://appleid.apple.com/auth/token', data)
         .toPromise();
+
       return response.data.refresh_token;
     } catch (error) {
+      console.log(error);
       throw new BadRequestException();
     }
   }
 
-  async appleTokenValidate(refresh_token) {
+  async appleTokenValidate(refresh_token, isAndroid?: boolean) {
+    const clientId = isAndroid ? appleConfig.android : appleConfig.client_id;
     const clientSecret = createClientSecret({
       keyId: appleConfig.keyId,
-      bundleId: appleConfig.bundleId,
+      bundleId: clientId,
       teamId: appleConfig.teamId,
       privateKey: appleConfig.privateKey,
     });
 
     const data = new URLSearchParams();
 
-    data.append('client_id', appleConfig.client_id);
+    data.append('client_id', clientId);
     data.append('grant_type', 'refresh_token');
     data.append('client_secret', clientSecret);
     data.append('redirect_uri', appleConfig.redirect_uri);
@@ -186,17 +192,18 @@ export class AuthService {
 
       const jwtClaims = await verifyAppleToken({
         idToken: response.data.id_token,
-        clientId: appleConfig.client_id,
+        clientId: clientId,
       });
       return jwtClaims.sub;
     } catch (error) {
+      console.log(error);
       throw new BadRequestException();
     }
   }
 
-  async appleLogin(refresh_token: string) {
+  async appleLogin(refresh_token: string, isAndroid?: boolean) {
     try {
-      const id = await this.appleTokenValidate(refresh_token);
+      const id = await this.appleTokenValidate(refresh_token, isAndroid);
       if (!id) throw new BadRequestException();
       const user = await this.usersService.getUser({ id: 'a' + id });
       if (!user) throw new NotFoundException();
@@ -215,9 +222,14 @@ export class AuthService {
     }
   }
 
-  async appleJoin(refresh_token: string, email: string, nickname: string) {
+  async appleJoin(
+    refresh_token: string,
+    email: string,
+    nickname: string,
+    isAndroid?: boolean,
+  ) {
     try {
-      const id = await this.appleTokenValidate(refresh_token);
+      const id = await this.appleTokenValidate(refresh_token, isAndroid);
       return await this.usersService.createUser('a' + id, email, nickname);
     } catch (error) {
       console.log(error);
