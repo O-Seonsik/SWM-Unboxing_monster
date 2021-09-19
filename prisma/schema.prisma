@@ -22,6 +22,7 @@ model User {
     coupon      Coupon[]
     Purchase    Purchase[]
     openResult  OpenResult[]
+    isManager   Boolean @default(false)
 }
 
 model Box {
@@ -37,6 +38,7 @@ model Box {
     purchase    BoxPurchase[]
     boxStorage  BoxStorage[]
     sales       Int     @default(0)
+    isManager   Boolean @default(false)
 }
 
 model Item {
