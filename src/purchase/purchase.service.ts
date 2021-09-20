@@ -18,10 +18,6 @@ export class PurchaseService {
     private readonly paymentsService: PaymentsService,
   ) {}
 
-  async getPurchases(): Promise<Purchase[]> {
-    return await this.prismaService.purchase.findMany();
-  }
-
   async getUserPurchase(
     purchaseWhereInput: Prisma.PurchaseWhereInput,
   ): Promise<Purchase[]> {
