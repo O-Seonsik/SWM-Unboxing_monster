@@ -53,28 +53,39 @@ export class PurchaseService {
   }
 
   async checkPurchase(boxes): Promise<boolean> {
-    const results = await Promise.all(
-      boxes.map(async (box) => {
-        const curBox = await this.prismaService.box.findUnique({
-          where: { id: box.boxId },
-          include: { items: { include: { item: true } } },
-        });
-        return curBox.items.length;
-      }),
-    );
+    try {
+      const results = await Promise.all(
+        boxes.map(async (box) => {
+          const curBox = await this.prismaService.box.findUnique({
+            where: { id: box.boxId },
+            include: { items: { include: { item: true } } },
+          });
+          return curBox.items.length;
+        }),
+      );
 
-    const result = results.filter((result) => !result);
+      const result = results.filter((result) => !result);
 
-    if (result.length)
-      throw new ForbiddenException('Requests containing empty boxes');
-    return true;
+      if (result.length)
+        throw new ForbiddenException('Requests containing empty boxes');
+      return true;
+    } catch (error) {
+      if (error.status) throw error;
+      throw new NotFoundException(
+        'Not found some boxes in your request',
+        'Not found error',
+      );
+    }
   }
 
-  async createPurchase(body: CreatePurchaseDto): Promise<Purchase | any> {
+  async createPurchase(
+    body: CreatePurchaseDto,
+    ownerId: string,
+  ): Promise<Purchase | any> {
     try {
       await this.checkPurchase(body.boxes);
 
-      const { ownerId, price, boxes, imp_uid, merchant_uid } = body;
+      const { price, boxes, imp_uid, merchant_uid } = body;
       const purchase = await this.prismaService.purchase.create({
         data: {
           ownerId: ownerId,
@@ -182,13 +193,14 @@ export class PurchaseService {
     }
   }
 
-  async refundPurchase(data: RefundDto): Promise<Purchase> {
-    const { merchant_uid, ownerId } = data;
+  async refundPurchase(data: RefundDto, ownerId: string): Promise<Purchase> {
+    const { merchant_uid } = data;
     try {
       const purchase = await this.prismaService.purchase.findUnique({
         where: { id: merchant_uid },
         include: { boxes: true },
       });
+
       if (!purchase)
         throw new NotFoundException(
           'merchant_uid 가 존재하지 않습니다.',
@@ -231,14 +243,22 @@ export class PurchaseService {
 
       await Promise.all(
         purchase.boxes.map(async (box) => {
-          await this.prismaService.boxStorage.updateMany({
+          const curBox = await this.prismaService.boxStorage.findFirst({
             where: { boxId: box.boxId, ownerId: ownerId },
-            data: {
-              count: {
-                decrement: box.count,
-              },
-            },
           });
+          if (curBox.count - box.count > 0)
+            await this.prismaService.boxStorage.updateMany({
+              where: { boxId: box.boxId, ownerId: ownerId },
+              data: {
+                count: {
+                  decrement: box.count,
+                },
+              },
+            });
+          else
+            await this.prismaService.boxStorage.delete({
+              where: { id: curBox.id },
+            });
         }),
       );
 

@@ -38,14 +38,21 @@ export class PurchaseController {
   }
 
   @ApiOperation({ summary: '결제확인, 사용자 박스 추가' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async createPurchase(@Body() body: CreatePurchaseDto): Promise<Purchase> {
-    return await this.purchaseService.createPurchase(body);
+  async createPurchase(
+    @Body() body: CreatePurchaseDto,
+    @Request() req,
+  ): Promise<Purchase> {
+    return await this.purchaseService.createPurchase(body, req.user.userId);
   }
 
   @ApiOperation({ summary: '결제확인, 환불' })
-  @Patch()
-  async refundPurchase(@Body() data: RefundDto) {
-    return await this.purchaseService.refundPurchase(data);
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Patch('refund')
+  async refundPurchase(@Body() data: RefundDto, @Request() req) {
+    return await this.purchaseService.refundPurchase(data, req.user.userId);
   }
 }
