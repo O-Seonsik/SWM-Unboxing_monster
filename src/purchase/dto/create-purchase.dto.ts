@@ -9,13 +9,6 @@ import { Type } from 'class-transformer';
 
 export class CreatePurchaseDto {
   /**
-   * 박스를 구매한 user의 ID
-   * @example 'k143214234234123'
-   */
-  @IsString()
-  readonly ownerId: string;
-
-  /**
    * 결제시 발급하는 merchant_uid(unique)
    * user_id+unix_time
    * @example k14321423423412321631083957

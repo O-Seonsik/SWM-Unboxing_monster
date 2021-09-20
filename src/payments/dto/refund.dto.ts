@@ -2,13 +2,6 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class RefundDto {
   /**
-   * 박스를 구매한 user의 ID
-   * @example 'k143214234234123'
-   */
-  @IsString()
-  readonly ownerId: string;
-
-  /**
    * 아임포트 결제시 발급받은 uid
    * @example imp_218715498371
    */
