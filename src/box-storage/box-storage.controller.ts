@@ -1,41 +1,21 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  ForbiddenException,
-  Get,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Controller, UseGuards, Request, Get } from '@nestjs/common';
 import { BoxStorageService } from './box-storage.service';
 import { BoxStorage } from '@prisma/client';
-import { CreateBoxStorageDto } from './dto/create-box-storage.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('boxStorage')
 @Controller('box-storage')
 export class BoxStorageController {
   constructor(private readonly boxStorageService: BoxStorageService) {}
 
-  @Get()
-  async getBoxStorage(): Promise<BoxStorage[]> {
-    return await this.boxStorageService.getBoxStorage();
-  }
-
-  @Get(':id')
-  async getUserBoxStorage(@Param('id') id: string): Promise<BoxStorage[]> {
-    return await this.boxStorageService.getUserBoxStorage({ ownerId: id });
-  }
-
-  @Post()
-  async createBoxStorage(
-    @Body() body: CreateBoxStorageDto,
-  ): Promise<BoxStorage | ForbiddenException> {
-    return this.boxStorageService.createBoxStorage(body);
-  }
-
-  @Delete(':id')
-  async deleteBoxStorage(@Param('id') id: number) {
-    return this.boxStorageService.deleteBoxStorage({ id: id });
+  @ApiOperation({ summary: '사용자 보유 박스 확인' })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Get('user')
+  async getUserBoxStorage(@Request() req): Promise<BoxStorage[]> {
+    return await this.boxStorageService.getUserBoxStorage({
+      ownerId: req.user.userId,
+    });
   }
 }
