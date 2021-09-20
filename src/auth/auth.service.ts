@@ -196,7 +196,6 @@ export class AuthService {
       });
       return jwtClaims.sub;
     } catch (error) {
-      console.log(error);
       throw new BadRequestException();
     }
   }
@@ -215,10 +214,7 @@ export class AuthService {
     } catch (error) {
       if (error.response.error === 'PRIMARY')
         throw new ConflictException('The id is already registered');
-      throw new BadRequestException(
-        'The token is not available',
-        'BadRequestException',
-      );
+      throw error;
     }
   }
 
