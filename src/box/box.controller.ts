@@ -15,7 +15,14 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { Box } from '@prisma/client';
 import { CreateBoxDto } from './dto/create-box.dto';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { BoxEntity } from './entities/box.entity';
 import { BoxService } from './box.service';
 import { CustomBoxDto } from './dto/custom-box.dto';
@@ -55,6 +62,9 @@ export class BoxController {
   }
 
   @ApiOperation({ summary: '커스텀 박스 랜덤으로 N개 가져오기' })
+  @ApiNotFoundResponse({
+    description: 'ownerId에 매치되는 유저가 존재하지 않을경우',
+  })
   @Get('custom/random')
   async getCustomBoxes(@Query() q: CustomBoxDto): Promise<Box[]> {
     const sql = `SELECT * FROM Box WHERE isManager = false ORDER BY RAND() LIMIT ${q.take};`;
@@ -80,12 +90,22 @@ export class BoxController {
   }
 
   @ApiOperation({ summary: '박스 번호로 검색' })
+  @ApiNotFoundResponse({
+    description: '박스 번호에 해당하는 박스가 존재하지 않는 경우',
+  })
   @Get(':id')
   async getBox(@Param('id') id: number): Promise<BoxEntity> {
     return await this.boxService.getBox({ id: id });
   }
 
   @ApiOperation({ summary: '박스 오픈' })
+  @ApiForbiddenResponse({
+    description:
+      '오픈하려는 상자의 개수만큼 사용자가 상자를 보유하지 않은 경우',
+  })
+  @ApiInternalServerErrorResponse({
+    description: '오픈 서버에 장애가 발생한 경우',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('open/:id')
@@ -98,6 +118,9 @@ export class BoxController {
   }
 
   @ApiOperation({ summary: '커스텀 박스 생성' })
+  @ApiNotFoundResponse({
+    description: 'ownerId에 매치되는 유저가 존재하지 않을경우',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -106,6 +129,12 @@ export class BoxController {
   }
 
   @ApiOperation({ summary: '커스텀 박스 삭제' })
+  @ApiNotFoundResponse({
+    description: '박스 번호에 해당하는 박스가 존재하지 않는 경우',
+  })
+  @ApiForbiddenResponse({
+    description: '삭제 요청 사용자의 id와 박스 ownerId가 다른 경우',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
