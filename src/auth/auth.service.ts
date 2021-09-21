@@ -30,9 +30,17 @@ export class AuthService {
         .toPromise();
       const id = userInfo.data.id;
 
-      if (!id) throw new BadRequestException();
+      if (!id)
+        throw new BadRequestException(
+          'The token is not available',
+          'BadRequestException',
+        );
       const user = await this.usersService.getUser({ id: 'k' + id });
-      if (!user) throw new NotFoundException();
+      if (!user)
+        throw new NotFoundException(
+          'You can use it after sign up',
+          'Not found error',
+        );
 
       const payload = { useremail: user.email, sub: user.id };
       return {
@@ -41,11 +49,17 @@ export class AuthService {
     } catch (error) {
       if (error.response.error === 'PRIMARY')
         throw new ConflictException('The id is already registered');
-      throw new BadRequestException(
-        'The token is not available',
-        'BadRequestException',
-      );
+      else if (error.status) throw error;
+      else if (error.response.data.code === -2)
+        throw new BadRequestException(
+          'The token is not available',
+          'BadRequestException',
+        );
     }
+    throw new InternalServerErrorException(
+      'Unexpected exception, please contact manager',
+      'Internal error',
+    );
   }
 
   async kakaoJoin(token: string, email: string, nickname: string) {
@@ -94,22 +108,28 @@ export class AuthService {
         .toPromise();
 
       const id = userInfo.data.data.user_id;
-      if (!id) throw new BadRequestException();
+      if (!id)
+        throw new BadRequestException(
+          'The token is not available',
+          'BadRequestException',
+        );
       const user = await this.usersService.getUser({ id: 'f' + id });
-      if (!user) throw new NotFoundException();
+      if (!user)
+        throw new NotFoundException(
+          'You can use it after sign up',
+          'Not found error',
+        );
       const payload = { useremail: user.email, sub: user.id };
       return {
         access_token: this.jwtService.sign(payload),
       };
     } catch (error) {
-      console.log(error);
       if (error.response.error === 'PRIMARY')
         throw new ConflictException('The id is already registered');
-      else if (error.response.statusCode === 404)
-        throw new NotFoundException('You can use it after sign up');
-      throw new BadRequestException(
-        'The token is not available',
-        'BadRequestException',
+      else if (error.status) throw error;
+      throw new InternalServerErrorException(
+        'Unexpected exception, please contact manager',
+        'Internal error',
       );
     }
   }
@@ -163,7 +183,6 @@ export class AuthService {
 
       return response.data.refresh_token;
     } catch (error) {
-      console.log(error);
       throw new BadRequestException();
     }
   }
@@ -203,9 +222,17 @@ export class AuthService {
   async appleLogin(refresh_token: string, isAndroid?: boolean) {
     try {
       const id = await this.appleTokenValidate(refresh_token, isAndroid);
-      if (!id) throw new BadRequestException();
+      if (!id)
+        throw new BadRequestException(
+          'The token is not available',
+          'BadRequestException',
+        );
       const user = await this.usersService.getUser({ id: 'a' + id });
-      if (!user) throw new NotFoundException();
+      if (!user)
+        throw new NotFoundException(
+          'You can use it after sign up',
+          'Not found error',
+        );
 
       const payload = { useremail: user.email, sub: user.id };
       return {
@@ -214,7 +241,7 @@ export class AuthService {
     } catch (error) {
       if (error.response.error === 'PRIMARY')
         throw new ConflictException('The id is already registered');
-      throw error;
+      else if (error.status) throw error;
     }
   }
 
