@@ -9,7 +9,16 @@ import {
 } from '@nestjs/common';
 import { CouponService } from './coupon.service';
 import { Coupon } from '@prisma/client';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotAcceptableResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { ConfirmCouponDto } from './dto/confirm-coupon.dto';
 
@@ -19,6 +28,14 @@ export class CouponController {
   constructor(private readonly couponService: CouponService) {}
 
   @ApiOperation({ summary: '쿠폰 사용' })
+  @ApiNotFoundResponse({ description: '요청한 쿠폰을 보유하지 않은 경우' })
+  @ApiConflictResponse({ description: '이미 쿠폰을 사용 혹은 환불한 경우' })
+  @ApiNotAcceptableResponse({ description: '쿠폰 유효기간이 만료된 경우' })
+  @ApiResponse({
+    status: 402,
+    description: '기프티콘 바우처 결제를 진행해야 하는 경우',
+  })
+  @ApiInternalServerErrorResponse({ description: 'AWS 서버 장애' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch('confirm/:couponId')
@@ -35,7 +52,9 @@ export class CouponController {
   }
 
   @ApiOperation({ summary: '쿠폰 환불' })
-  @ApiBearerAuth()
+  @ApiNotFoundResponse({ description: '요청한 쿠폰을 보유하지 않은 경우' })
+  @ApiConflictResponse({ description: '이미 쿠폰을 사용 혹은 환불한 경우' })
+  @ApiNotAcceptableResponse({ description: '쿠폰 유효기간이 만료된 경우' })
   @UseGuards(JwtAuthGuard)
   @Patch('refund/:couponId')
   async refundCoupon(
