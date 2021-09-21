@@ -65,4 +65,14 @@ export class UsersService {
       return e;
     }
   }
+
+  async nicknameCheck(nickname: string): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        nickname: nickname,
+      },
+    });
+
+    return Boolean(user);
+  }
 }
