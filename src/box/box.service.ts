@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   NotFoundException,
   InternalServerErrorException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Box } from '@prisma/client';
@@ -81,6 +82,28 @@ export class BoxService {
     try {
       const { title, price, image, isLocal, detail, boxItems } = box;
 
+      // 상품 가격 가져오기 && 존재하지 않는 아이템 검사하기
+      const prices = await Promise.all(
+        boxItems.map(async (item) => {
+          const curItem = await this.prismaService.item.findUnique({
+            where: { id: item },
+          });
+          if (!curItem)
+            throw new ForbiddenException(
+              '존재하지 않는 박스가 포함되어 있습니다.',
+              'Forbidden error',
+            );
+          return curItem.price;
+        }),
+      );
+
+      // 상품 가격보다 박스의 가격이 비싸거나 저렴한 경우 검사하기
+      if (price < Math.min(...prices) || price > Math.max(...prices))
+        throw new BadRequestException(
+          '박스의 가격은 선택 상품의 최소 가격과 선택 상품의 최대 가격 사이의 값으로 구성되어야 합니다.',
+          'Bad request error',
+        );
+
       // 박스 생성
       const result = await this.prismaService.box.create({
         data: {
@@ -107,7 +130,7 @@ export class BoxService {
     } catch (e) {
       if (e.code === 'P2003')
         throw new NotFoundException("The ownerId doesn't exist in our service");
-      return e;
+      throw e;
     }
   }
 

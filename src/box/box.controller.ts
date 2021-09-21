@@ -16,6 +16,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Box } from '@prisma/client';
 import { CreateBoxDto } from './dto/create-box.dto';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
@@ -118,6 +119,12 @@ export class BoxController {
   }
 
   @ApiOperation({ summary: '커스텀 박스 생성' })
+  @ApiBadRequestResponse({
+    description: '존재하지 않는 아이템을 담은 상자 생성 요청시',
+  })
+  @ApiForbiddenResponse({
+    description: '박스 가격이 상품들의 가격을 초과 혹은 미만인 경우',
+  })
   @ApiNotFoundResponse({
     description: 'ownerId에 매치되는 유저가 존재하지 않을경우',
   })
