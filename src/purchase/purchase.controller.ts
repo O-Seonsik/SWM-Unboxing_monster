@@ -10,7 +10,14 @@ import {
 } from '@nestjs/common';
 import { PurchaseService } from './purchase.service';
 import { Purchase } from '@prisma/client';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { RefundDto } from '../payments/dto/refund.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -38,6 +45,11 @@ export class PurchaseController {
   }
 
   @ApiOperation({ summary: '결제확인, 사용자 박스 추가' })
+  @ApiBadRequestResponse({ description: '결제 요청에 위조가 발생한 경우' })
+  @ApiNotFoundResponse({
+    description: '구매하려는 박스가 서버에 존재하지 않는 경우',
+  })
+  @ApiConflictResponse({ description: '이미 처리된 결제 요청인 경우' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -49,6 +61,11 @@ export class PurchaseController {
   }
 
   @ApiOperation({ summary: '결제확인, 환불' })
+  @ApiBadRequestResponse({
+    description: '존재하지 않는 ipm_uid 혹은, checksum이 올바르지 않은 경우',
+  })
+  @ApiNotFoundResponse({ description: 'merchant_uid 가 존재하지 않는 경우' })
+  @ApiConflictResponse({ description: '이미 환불된 내역인 경우' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch('refund')
