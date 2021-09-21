@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { OpenResult } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { openResult } from './entities/get-open-result.entity';
+import { OpenDistribution } from './entities/get-open-distribution.entity';
 
 @Injectable()
 export class OpenResultService {
@@ -11,8 +12,8 @@ export class OpenResultService {
     boxId: number,
     skip: number,
     take: number,
-  ): Promise<openResult> {
-    const openResults = await this.prismaService.openResult.findMany({
+  ): Promise<openResult[]> {
+    return await this.prismaService.openResult.findMany({
       include: { user: true, item: true },
       orderBy: {
         id: 'desc',
@@ -21,18 +22,23 @@ export class OpenResultService {
       take: take,
       where: { boxId: boxId },
     });
+  }
 
-    const openDistribution = await this.prismaService.openResult.groupBy({
+  async getOpenDistribution(boxId: number): Promise<OpenDistribution[]> {
+    const query = await this.prismaService.openResult.groupBy({
       by: ['itemId'],
       _count: {
         itemId: true,
       },
       where: { boxId: boxId },
     });
-    return {
-      openResults,
-      openDistribution,
-    };
+
+    return query.map((item) => {
+      return {
+        ...item,
+        _count: item._count.itemId,
+      };
+    });
   }
 
   async createOpenResult(

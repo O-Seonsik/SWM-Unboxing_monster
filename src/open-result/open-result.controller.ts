@@ -13,4 +13,10 @@ export class OpenResultController {
   async getOpenResult(@Param('id') id: number, @Query() q: OpenResultDto) {
     return await this.openResultService.getOpenResult(id, q.skip, q.take);
   }
+
+  @ApiOperation({ summary: '박스 전체 결과 카운트' })
+  @Get('/distribution/:id')
+  async test(@Param('id') id: number) {
+    return await this.openResultService.getOpenDistribution(id);
+  }
 }
