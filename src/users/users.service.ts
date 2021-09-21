@@ -45,9 +45,9 @@ export class UsersService {
     try {
       return await this.prisma.user.update({ data, where });
     } catch (e) {
-      if (e.code === 'P2025') throw new NotFoundException(e.code, e.meta.cause);
       if (e.code === 'P2002')
         throw new ForbiddenException(e.code, e.meta.target);
+      if (e.code === 'P2025') throw new NotFoundException(e.code, e.meta.cause);
     }
   }
 
