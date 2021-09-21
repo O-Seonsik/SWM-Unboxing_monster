@@ -33,7 +33,4 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 /.env
-/src/auth/constants.ts
 /prisma/migrations
-/src/payments/constants.ts
-/src/coupon/constants.ts
