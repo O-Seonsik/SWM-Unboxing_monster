@@ -14,6 +14,7 @@ import { config, Lambda } from 'aws-sdk';
 import { awsConfig } from './constants';
 import { UsersService } from '../users/users.service';
 import { ItemService } from '../item/item.service';
+import { PointService } from '../point/point.service';
 
 @Injectable()
 export class CouponService {
@@ -21,6 +22,7 @@ export class CouponService {
     private readonly prismaService: PrismaService,
     private readonly usersService: UsersService,
     private readonly itemService: ItemService,
+    private readonly pointService: PointService,
   ) {}
 
   async getCoupons(): Promise<Coupon[]> {
@@ -222,13 +224,26 @@ export class CouponService {
       });
 
       // 사용자 포인트 증가
-      await this.usersService.updateUser({
+      const user = await this.usersService.updateUser({
         where: { id: userId },
         data: {
           point: {
             increment: price * 0.8,
           },
         },
+      });
+
+      // 대상 상품 찾기
+      const item = await this.itemService.getItem({ id: coupon.itemId });
+
+      // 포인트 증가 기록
+      await this.pointService.createPoint({
+        userId: userId,
+        title: item.title + ' 환불',
+        point: price * 0.8,
+        total: user.point,
+        isAdd: true,
+        time: new Date().toString(),
       });
 
       return usedCoupon;

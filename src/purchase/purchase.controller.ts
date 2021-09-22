@@ -14,6 +14,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
+  ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOperation,
   ApiTags,
@@ -37,6 +38,8 @@ export class PurchaseController {
     });
   }
 
+  @Get('points')
+
   // Deprecated
   @ApiOperation({ summary: '특정 결제 로그 가져오기, Deprecated' })
   @Get(':id')
@@ -46,6 +49,7 @@ export class PurchaseController {
 
   @ApiOperation({ summary: '결제확인, 사용자 박스 추가' })
   @ApiBadRequestResponse({ description: '결제 요청에 위조가 발생한 경우' })
+  @ApiForbiddenResponse({ description: '포인트가 부족한 경우' })
   @ApiNotFoundResponse({
     description: '구매하려는 박스가 서버에 존재하지 않는 경우',
   })

@@ -25,6 +25,16 @@ model User {
     isManager   Boolean @default(false)
 }
 
+model Point {
+    id      Int     @default(autoincrement())   @id
+    userId  String
+    title   String
+    point   Int
+    total   Int
+    isAdd   Boolean
+    time    String
+}
+
 model Box {
     id          Int             @default(autoincrement()) @id
     title       String
@@ -89,6 +99,7 @@ model Purchase {
     price           Int
     refund          Boolean     @default(false)
     refundAt        String?
+    usedPoint       Int         @default(0)
 }
 
 model Notice {

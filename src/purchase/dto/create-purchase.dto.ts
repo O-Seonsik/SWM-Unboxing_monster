@@ -2,6 +2,7 @@ import {
   ArrayMinSize,
   IsArray,
   IsNumber,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
@@ -38,6 +39,14 @@ export class CreatePurchaseDto {
   @ArrayMinSize(1)
   @Type(() => Box)
   readonly boxes: Box[];
+
+  /**
+   * 사용한 포인트 액수
+   * @example 100
+   */
+  @IsOptional()
+  @IsNumber()
+  readonly point?: number;
 }
 
 class Box {
@@ -49,7 +58,7 @@ class Box {
   readonly boxId: number;
 
   /**
-   * 구매한 밗의 개수
+   * 구매한 박스의 개수
    * @example 2
    */
   @IsNumber()

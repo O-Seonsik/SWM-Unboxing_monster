@@ -7,6 +7,7 @@ import { UsersService } from '../users/users.service';
 import { OpenResultService } from '../open-result/open-result.service';
 import { CouponService } from '../coupon/coupon.service';
 import { ItemService } from '../item/item.service';
+import { PointService } from '../point/point.service';
 
 @Module({
   imports: [HttpModule],
@@ -18,6 +19,7 @@ import { ItemService } from '../item/item.service';
     OpenResultService,
     CouponService,
     ItemService,
+    PointService,
   ],
 })
 export class BoxModule {}

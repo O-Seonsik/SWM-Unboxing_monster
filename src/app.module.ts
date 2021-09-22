@@ -12,6 +12,7 @@ import { CouponModule } from './coupon/coupon.module';
 import { BoxStorageModule } from './box-storage/box-storage.module';
 import { PaymentsModule } from './payments/payments.module';
 import { OpenResultModule } from './open-result/open-result.module';
+import { PointModule } from './point/point.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { OpenResultModule } from './open-result/open-result.module';
     BoxStorageModule,
     PaymentsModule,
     OpenResultModule,
+    PointModule,
   ],
   controllers: [AppController],
   providers: [AppService],

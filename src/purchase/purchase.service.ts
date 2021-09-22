@@ -10,12 +10,14 @@ import { Prisma, Purchase } from '@prisma/client';
 import { CreatePurchaseDto } from './dto/create-purchase.dto';
 import { PaymentsService } from '../payments/payments.service';
 import { RefundDto } from '../payments/dto/refund.dto';
+import { PointService } from '../point/point.service';
 
 @Injectable()
 export class PurchaseService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly paymentsService: PaymentsService,
+    private readonly pointService: PointService,
   ) {}
 
   async getUserPurchase(
@@ -78,6 +80,14 @@ export class PurchaseService {
     }
   }
 
+  async pointCheck(userId: string, point: number): Promise<boolean> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+
+    return user.point >= point;
+  }
+
   async createPurchase(
     body: CreatePurchaseDto,
     ownerId: string,
@@ -85,7 +95,9 @@ export class PurchaseService {
     try {
       await this.checkPurchase(body.boxes);
 
-      const { price, boxes, imp_uid, merchant_uid } = body;
+      const { price, boxes, imp_uid, merchant_uid, point } = body;
+      const usedPoint = point ? point : 0;
+
       const purchase = await this.prismaService.purchase.create({
         data: {
           ownerId: ownerId,
@@ -94,8 +106,30 @@ export class PurchaseService {
           refundAt: null,
           imp_uid: imp_uid,
           purchaseAt: new Date().toString(),
+          usedPoint: usedPoint,
         },
       });
+
+      if (!(await this.pointCheck(ownerId, usedPoint)))
+        throw new ForbiddenException('포인트가 부족합니다.', 'Forbidden error');
+
+      if (purchase.usedPoint) {
+        // 포인트 사용 처리
+        const user = await this.prismaService.user.update({
+          where: { id: ownerId },
+          data: { point: { decrement: usedPoint } },
+        });
+
+        // 포인트 감소 기록
+        await this.pointService.createPoint({
+          userId: ownerId,
+          title: '포인트 사용',
+          point: usedPoint,
+          total: user.point,
+          isAdd: false,
+          time: new Date().toString(),
+        });
+      }
 
       const boxPurchase = boxes.map((box) => {
         return {
@@ -111,11 +145,14 @@ export class PurchaseService {
 
       // 결제 내용 확인..
       // payments의 checkForgery를 통해 제대로 된 결제가 진행되었는지 확인
-      const forgery = await this.paymentsService.checkForgery({
-        merchant_uid: merchant_uid,
-        boxes: boxes,
-        imp_uid: imp_uid,
-      });
+      const forgery = await this.paymentsService.checkForgery(
+        {
+          merchant_uid: merchant_uid,
+          boxes: boxes,
+          imp_uid: imp_uid,
+        },
+        usedPoint,
+      );
 
       if (!forgery)
         throw new BadRequestException(
@@ -241,6 +278,24 @@ export class PurchaseService {
           refundAt: new Date().toString(),
         },
       });
+
+      if (purchase.usedPoint) {
+        // 포인트 증가 처리
+        const user = await this.prismaService.user.update({
+          where: { id: ownerId },
+          data: { point: { increment: purchase.usedPoint } },
+        });
+
+        // 포인트 증가 기록
+        await this.pointService.createPoint({
+          userId: ownerId,
+          title: '박스 환불',
+          point: purchase.usedPoint,
+          total: user.point,
+          isAdd: true,
+          time: new Date().toString(),
+        });
+      }
 
       await Promise.all(
         purchase.boxes.map(async (box) => {

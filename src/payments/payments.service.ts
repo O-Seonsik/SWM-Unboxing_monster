@@ -45,7 +45,7 @@ export class PaymentsService {
           headers: { Authorization: accessToken },
         })
         .toPromise();
-      console.log(res.data.response.cancel_history.length);
+
       if (res.data.response.cancel_history.length)
         throw new ConflictException(
           '이미 환불된 결제입니다.',
@@ -63,7 +63,7 @@ export class PaymentsService {
     }
   }
 
-  async checkForgery(data: PaymentsDto): Promise<boolean> {
+  async checkForgery(data: PaymentsDto, usedPoint: number): Promise<boolean> {
     const { boxes, imp_uid, merchant_uid } = data;
     const serverData = await this.getPaymentData(imp_uid);
     if (serverData.merchant_uid !== merchant_uid)
@@ -73,7 +73,7 @@ export class PaymentsService {
       );
     try {
       const amounts = {
-        server: serverData.amount,
+        server: serverData.amount + usedPoint,
         client: 0,
       };
 
