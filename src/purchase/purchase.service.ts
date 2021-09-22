@@ -62,6 +62,7 @@ export class PurchaseService {
             where: { id: box.boxId },
             include: { items: { include: { item: true } } },
           });
+          if (curBox.isDelete) return false;
           return curBox.items.length;
         }),
       );

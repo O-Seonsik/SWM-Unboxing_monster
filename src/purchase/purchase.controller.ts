@@ -51,7 +51,8 @@ export class PurchaseController {
   @ApiBadRequestResponse({ description: '결제 요청에 위조가 발생한 경우' })
   @ApiForbiddenResponse({ description: '포인트가 부족한 경우' })
   @ApiNotFoundResponse({
-    description: '구매하려는 박스가 서버에 존재하지 않는 경우',
+    description:
+      '구매하려는 박스가 서버에 존재하지 않는 경우 혹은 merchant_uid 가 존재하지 않는 경우',
   })
   @ApiConflictResponse({ description: '이미 처리된 결제 요청인 경우' })
   @ApiBearerAuth()

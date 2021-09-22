@@ -31,6 +31,7 @@ export class BoxService {
       take: take,
       where: {
         isManager: true,
+        isDelete: false,
       },
     });
   }
@@ -39,7 +40,7 @@ export class BoxService {
     return await this.prismaService.box.findMany({
       skip: skip,
       take: take,
-      where: { ownerId: id },
+      where: { ownerId: id, isDelete: false },
     });
   }
 
@@ -66,6 +67,7 @@ export class BoxService {
     return await this.prismaService.box.findMany({
       take: take,
       orderBy: { sales: 'desc' },
+      where: { isDelete: false },
     });
   }
 
@@ -75,6 +77,7 @@ export class BoxService {
         title: {
           contains: keyword,
         },
+        isDelete: false,
       },
     });
   }
