@@ -93,6 +93,7 @@ export class PurchaseService {
           price: price,
           refundAt: null,
           imp_uid: imp_uid,
+          purchaseAt: new Date().toString(),
         },
       });
 
@@ -237,7 +238,7 @@ export class PurchaseService {
         where: { id: merchant_uid },
         data: {
           refund: true,
-          refundAt: new Date(),
+          refundAt: new Date().toString(),
         },
       });
 

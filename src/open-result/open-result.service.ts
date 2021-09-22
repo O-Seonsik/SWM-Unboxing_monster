@@ -52,6 +52,7 @@ export class OpenResultService {
           boxId: boxId,
           userId: userId,
           itemId: itemId,
+          openAt: new Date().toString(),
         },
       });
     } catch (error) {

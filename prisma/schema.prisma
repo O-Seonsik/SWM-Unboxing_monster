@@ -84,10 +84,10 @@ model Purchase {
     owner           User        @relation(fields: [ownerId], references: [id])
     ownerId         String
     boxes           BoxPurchase[]
-    purchaseAt      DateTime    @default(now())
+    purchaseAt      String
     price           Int
     refund          Boolean     @default(false)
-    refundAt        DateTime?
+    refundAt        String?
 }
 
 model Notice {
@@ -125,5 +125,5 @@ model OpenResult {
     item    Item    @relation(fields: [itemId], references: [id])
     userId  String
     itemId  Int
-    openAt  DateTime    @default(now())
+    openAt  String
 }
