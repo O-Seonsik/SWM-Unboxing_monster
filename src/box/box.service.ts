@@ -154,7 +154,6 @@ export class BoxService {
         where: { id: id },
         data: { isDelete: true },
       });
-      // return await this.prismaService.box.delete({ where: { id: id } });
     } catch (error) {
       if (error.code === 'P2025')
         throw new NotFoundException(error.code, error.meta.cause);
