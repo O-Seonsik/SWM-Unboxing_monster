@@ -18,6 +18,7 @@ import { CreateBoxDto } from './dto/create-box.dto';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
@@ -142,6 +143,7 @@ export class BoxController {
   @ApiForbiddenResponse({
     description: '삭제 요청 사용자의 id와 박스 ownerId가 다른 경우',
   })
+  @ApiConflictResponse({ description: '이미 박스를 삭제한 경우' })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Delete(':id')

@@ -26,19 +26,20 @@ model User {
 }
 
 model Box {
-    id          Int     @default(autoincrement()) @id
+    id          Int             @default(autoincrement()) @id
     title       String
     price       Int
     image       String
     isLocal     Boolean
     detail      String
-    owner       User    @relation(fields: [ownerId], references: [id])
+    owner       User            @relation(fields: [ownerId], references: [id])
     ownerId     String
     items       BoxItem[]
     purchase    BoxPurchase[]
     boxStorage  BoxStorage[]
-    sales       Int     @default(0)
-    isManager   Boolean @default(false)
+    sales       Int             @default(0)
+    isManager   Boolean         @default(false)
+    isDelete    Boolean         @default(false)
 }
 
 model Item {

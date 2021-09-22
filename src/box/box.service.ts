@@ -4,6 +4,7 @@ import {
   NotFoundException,
   InternalServerErrorException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, Box } from '@prisma/client';
@@ -142,13 +143,24 @@ export class BoxService {
           '해당 박스에 권한이 없습니다.',
           'Forbidden error',
         );
-      return await this.prismaService.box.delete({ where: { id: id } });
+
+      if (box['isDelete'])
+        throw new ConflictException(
+          '이미 삭제된 박스입니다.',
+          'Conflict error',
+        );
+
+      return await this.prismaService.box.update({
+        where: { id: id },
+        data: { isDelete: true },
+      });
+      // return await this.prismaService.box.delete({ where: { id: id } });
     } catch (error) {
       if (error.code === 'P2025')
         throw new NotFoundException(error.code, error.meta.cause);
       if (error.code === 'P2002')
         throw new ForbiddenException(error.code, error.meta.target);
-      return error;
+      throw error;
     }
   }
 
