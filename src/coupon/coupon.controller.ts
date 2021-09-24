@@ -1,5 +1,6 @@
 import {
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -12,6 +13,7 @@ import { Coupon } from '@prisma/client';
 import {
   ApiBearerAuth,
   ApiConflictResponse,
+  ApiForbiddenResponse,
   ApiInternalServerErrorResponse,
   ApiNotAcceptableResponse,
   ApiNotFoundResponse,
@@ -71,5 +73,19 @@ export class CouponController {
   @Get('/user')
   async getUserCoupon(@Request() req): Promise<Coupon[]> {
     return await this.couponService.getUserCoupon({ ownerId: req.user.userId });
+  }
+
+  @ApiOperation({ summary: '사용자 쿠폰 삭제' })
+  @ApiBearerAuth()
+  @ApiForbiddenResponse({ description: '다른 사용자의 쿠폰을 삭제한 경우' })
+  @ApiNotFoundResponse({ description: '서버에 없는 쿠폰인 경우' })
+  @ApiConflictResponse({ description: '이미 삭제된 쿠폰인 경우' })
+  @UseGuards(JwtAuthGuard)
+  @Delete('/user/:couponId')
+  async deleteUserCoupon(
+    @Param('couponId') couponId: number,
+    @Request() req,
+  ): Promise<Coupon> {
+    return await this.couponService.deleteCoupon(couponId, req.user.userId);
   }
 }

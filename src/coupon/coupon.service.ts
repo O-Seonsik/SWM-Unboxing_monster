@@ -86,19 +86,41 @@ export class CouponService {
     }
   }
 
-  async deleteCoupon(
-    couponWhereUniqueInput: Prisma.CouponWhereUniqueInput,
-  ): Promise<Coupon> {
+  async deleteCoupon(couponId: number, userId: string): Promise<Coupon> {
     try {
-      return await this.prismaService.coupon.delete({
-        where: couponWhereUniqueInput,
+      // 쿠폰 객체 찾기
+      const coupon = await this.prismaService.coupon.findUnique({
+        where: { id: couponId },
+      });
+
+      // 쿠폰이 존재하지 않는 경우
+      if (!coupon)
+        throw new NotFoundException(
+          '해당 쿠폰이 존재하지 않습니다.',
+          'Not found error',
+        );
+
+      // 이미 삭제된 쿠폰인 경우
+      if (!coupon.isShow)
+        throw new ConflictException(
+          '이미 삭제된 쿠폰입니다.',
+          'Conflict error',
+        );
+
+      // 다른 사용자의 쿠폰에 접근한 경우
+      if (coupon.ownerId !== userId)
+        throw new ForbiddenException(
+          '쿠폰 접근 권한이 없습니다.',
+          'Forbidden error',
+        );
+
+      // 삭제 처리
+      return await this.prismaService.coupon.update({
+        where: { id: couponId },
+        data: { isShow: false },
       });
     } catch (error) {
-      if (error.code === 'P2025')
-        throw new NotFoundException(error.code, error.meta.cause);
-      if (error.code === 'P2002')
-        throw new ForbiddenException(error.code, error.meta.target);
-      return error;
+      throw error;
     }
   }
 
@@ -126,15 +148,6 @@ export class CouponService {
         throw new ConflictException(
           'Already used this coupon',
           'Conflict error',
-        );
-
-      // 쿠폰 유효기간이 만료된 경우
-      const now = new Date();
-      const expiration = new Date(coupon.Expiration);
-      if (now > expiration)
-        throw new NotAcceptableException(
-          'This coupon has expired',
-          'Not acceptable error',
         );
 
       // Payload 정상 값 넣어주기 -> productId, phoneNumber, item_title

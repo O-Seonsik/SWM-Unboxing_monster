@@ -119,6 +119,7 @@ model Coupon {
     refund      Boolean     @default(false)
     refundAt    String?
     Expiration  String
+    isShow      Boolean     @default(true)
 }
 
 model BoxStorage {
