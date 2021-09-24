@@ -72,7 +72,10 @@ export class CouponController {
   @UseGuards(JwtAuthGuard)
   @Get('/user')
   async getUserCoupon(@Request() req): Promise<Coupon[]> {
-    return await this.couponService.getUserCoupon({ ownerId: req.user.userId });
+    return await this.couponService.getUserCoupon({
+      ownerId: req.user.userId,
+      isShow: true,
+    });
   }
 
   @ApiOperation({ summary: '사용자 쿠폰 삭제' })

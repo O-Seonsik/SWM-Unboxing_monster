@@ -15,10 +15,6 @@ export class UsersService {
   ): Promise<User> {
     return this.prisma.user.findUnique({
       where: userWhereUniqueInput,
-      include: {
-        boxStorage: true,
-        coupon: { where: { refund: false, isUsed: false } },
-      },
     });
   }
 
