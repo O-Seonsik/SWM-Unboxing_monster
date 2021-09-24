@@ -52,6 +52,7 @@ export class CouponController {
   }
 
   @ApiOperation({ summary: '쿠폰 환불' })
+  @ApiBearerAuth()
   @ApiNotFoundResponse({ description: '요청한 쿠폰을 보유하지 않은 경우' })
   @ApiConflictResponse({ description: '이미 쿠폰을 사용 혹은 환불한 경우' })
   @ApiNotAcceptableResponse({ description: '쿠폰 유효기간이 만료된 경우' })
