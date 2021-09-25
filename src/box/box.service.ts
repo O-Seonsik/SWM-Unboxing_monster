@@ -168,18 +168,17 @@ export class BoxService {
 
   async getBoxOpen(id: number, count: number, userId: string): Promise<any> {
     try {
-      const userBoxes: any = await this.usersService.getUser({ id: userId });
-      const targetBox = userBoxes.boxStorage.filter(
-        (box) => box.boxId === id,
-      )[0];
+      const targetBox = await this.prismaService.boxStorage.findFirst({
+        where: { ownerId: userId, boxId: id },
+      });
 
       if (!targetBox) {
-        return new NotFoundException(
+        throw new NotFoundException(
           'Not found exception',
           `User doesn't have box id ${id}`,
         );
       } else if (targetBox.count < count) {
-        return new ForbiddenException(
+        throw new ForbiddenException(
           'Forbidden exception',
           `User has only ${targetBox.count} boxes but request ${count} boxes`,
         );
@@ -248,13 +247,13 @@ export class BoxService {
           }),
         );
       } catch (error) {
-        return new InternalServerErrorException(
+        throw new InternalServerErrorException(
           'Opening server error',
           'The opening server with blockchain is occurred error',
         );
       }
     } catch (error) {
-      return error;
+      throw error;
     }
   }
 
