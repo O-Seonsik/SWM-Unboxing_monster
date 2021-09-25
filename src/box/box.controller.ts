@@ -30,6 +30,7 @@ import { BoxService } from './box.service';
 import { CustomBoxDto } from './dto/custom-box.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { SkipTakeDto } from './dto/skip-take.dto';
+import { OpenBoxDto } from './dto/open-box.dto';
 
 @ApiTags('Box')
 @Controller('box')
@@ -111,7 +112,11 @@ export class BoxController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get('open/:id')
-  async getBoxOpen(@Param('id') id: number, @Query() q, @Request() req) {
+  async getBoxOpen(
+    @Param('id') id: number,
+    @Query() q: OpenBoxDto,
+    @Request() req,
+  ) {
     return await this.boxService.getBoxOpen(
       id,
       q.count ? +q.count : 1,
