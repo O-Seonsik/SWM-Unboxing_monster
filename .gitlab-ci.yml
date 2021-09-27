@@ -1,6 +1,10 @@
+
 deploy:
   stage: deploy
   image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest  # see the note below
+  before_script:
+    - apt-get update
+    - apt-get install nodejs
   script:
     - npm install
     - npx prisma migrate dev --name renew
