@@ -13,7 +13,8 @@ deploy:
   script:
     - npm install
     - npx prisma migrate deploy
-    - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 120032305088.dkr.ecr.ap-northeast-2.amazonaws.com
+    - aws ecr get-login
+    # - aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 120032305088.dkr.ecr.ap-northeast-2.amazonaws.com
     - docker build --tag unboxing-server:latest .
     - docker tag unboxing-server:latest 120032305088.dkr.ecr.ap-northeast-2.amazonaws.com/unboxing-server:latest
     - docker push 120032305088.dkr.ecr.ap-northeast-2.amazonaws.com/unboxing-server:latest
