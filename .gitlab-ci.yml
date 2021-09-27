@@ -4,7 +4,7 @@ variables:
 deploy:
   stage: deploy
   image: 
-    name: sleavely/node-awscli:14
+    name: sleavely/node-awscli:14.x
     entrypoint: [""]
   before_script:
     - aws --version
