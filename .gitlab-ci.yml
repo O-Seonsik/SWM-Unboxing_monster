@@ -8,7 +8,7 @@ deploy:
     entrypoint: [""]
   before_script:
     - aws --version
-    # - apt update
+    - apt update
     - apt install -y docker.io
     # - curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
     # - export NVM_DIR="$HOME/.nvm"
