@@ -4,21 +4,21 @@ variables:
 deploy:
   stage: deploy
   image: 
-    name: amazon/aws-cli
+    name: sleavely/node-awscli:14
     entrypoint: [""]
   before_script:
     - aws --version
-    - apt update
-    - apt install -y curl docker.io
-    - curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
-    - export NVM_DIR="$HOME/.nvm"
-    - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
-    - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
-    - nvm install 14
-    - mkdir ~/.aws
-    - echo "[default]" >> ~/.aws/credentials
-    - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
-    - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
+    # - apt update
+    # - apt install -y curl docker.io
+    # - curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+    # - export NVM_DIR="$HOME/.nvm"
+    # - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+    # - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+    # - nvm install 14
+    # - mkdir ~/.aws
+    # - echo "[default]" >> ~/.aws/credentials
+    # - echo "aws_access_key_id = $AWS_ACCESS_KEY_ID" >> ~/.aws/credentials
+    # - echo "aws_secret_access_key = $AWS_SECRET_ACCESS_KEY" >> ~/.aws/credentials
   script:
     - npm install
     - npx prisma migrate deploy
