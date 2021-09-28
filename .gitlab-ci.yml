@@ -3,7 +3,7 @@ variables:
 
 deploy:
   stage: deploy
-  image: 
+  image:
     name: sleavely/node-awscli:14.x
     entrypoint: [""]
   before_script:
