@@ -8,16 +8,23 @@ import { OpenDistribution } from './entities/get-open-distribution.entity';
 export class OpenResultService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getOpenResult(
+  async getOpenResult(skip: number, take: number): Promise<openResult[]> {
+    return await this.prismaService.openResult.findMany({
+      include: { user: true, item: true },
+      orderBy: { id: 'desc' },
+      skip: skip,
+      take: take,
+    });
+  }
+
+  async getBoxOpenResult(
     boxId: number,
     skip: number,
     take: number,
   ): Promise<openResult[]> {
     return await this.prismaService.openResult.findMany({
       include: { user: true, item: true },
-      orderBy: {
-        id: 'desc',
-      },
+      orderBy: { id: 'desc' },
       skip: skip,
       take: take,
       where: { boxId: boxId },

@@ -8,10 +8,16 @@ import { OpenResultDto } from './dto/open-result.dto';
 export class OpenResultController {
   constructor(private readonly openResultService: OpenResultService) {}
 
+  @ApiOperation({ summary: '전체 박스 오픈 결과' })
+  @Get('')
+  async getOpenResult(@Query() q: OpenResultDto) {
+    return await this.openResultService.getOpenResult(q.skip, q.take);
+  }
+
   @ApiOperation({ summary: '박스 오픈 결과' })
   @Get(':id')
-  async getOpenResult(@Param('id') id: number, @Query() q: OpenResultDto) {
-    return await this.openResultService.getOpenResult(id, q.skip, q.take);
+  async getBoxOpenResult(@Param('id') id: number, @Query() q: OpenResultDto) {
+    return await this.openResultService.getBoxOpenResult(id, q.skip, q.take);
   }
 
   @ApiOperation({ summary: '박스 전체 결과 카운트' })
