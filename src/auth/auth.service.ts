@@ -159,13 +159,16 @@ export class AuthService {
   }
 
   async getAppleToken(q: AppleTokenDto) {
+    const applePrivateKey = appleConfig.privateKey.replace(/\\n/g, '\n');
+    console.log(appleConfig.privateKey);
+    console.log(applePrivateKey);
     const clientId = q.isAndroid ? appleConfig.android : appleConfig.client_id;
 
     const clientSecret = createClientSecret({
       keyId: appleConfig.keyId,
       bundleId: clientId,
       teamId: appleConfig.teamId,
-      privateKey: appleConfig.privateKey,
+      privateKey: applePrivateKey,
     });
 
     const data = new URLSearchParams();
@@ -183,6 +186,7 @@ export class AuthService {
 
       return response.data.refresh_token;
     } catch (error) {
+      console.log(error);
       throw new BadRequestException();
     }
   }
