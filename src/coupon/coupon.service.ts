@@ -193,11 +193,11 @@ export class CouponService {
   // 쿠폰 환불
   async refundCoupon(userId: string, couponId: number): Promise<Coupon> {
     try {
-      // 쿠폰 존재여부 확인
-      const userInfo = await this.usersService.getUser({ id: userId });
-      const coupon = userInfo['coupon'].find(
-        (coupon) => coupon.id === couponId,
-      );
+      // 쿠폰 아이디로 유저에게 쿠폰 존재여부 확인
+      const coupon = await this.prismaService.coupon.findFirst({
+        where: { id: couponId, ownerId: userId },
+      });
+
       // 요청한 쿠폰을 보유하지 않은 경우
       if (!coupon)
         throw new NotFoundException(
