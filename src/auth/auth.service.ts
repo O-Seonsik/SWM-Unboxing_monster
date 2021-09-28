@@ -160,8 +160,6 @@ export class AuthService {
 
   async getAppleToken(q: AppleTokenDto) {
     const applePrivateKey = appleConfig.privateKey.replace(/\\n/g, '\n');
-    console.log(appleConfig.privateKey);
-    console.log(applePrivateKey);
     const clientId = q.isAndroid ? appleConfig.android : appleConfig.client_id;
 
     const clientSecret = createClientSecret({
@@ -186,18 +184,18 @@ export class AuthService {
 
       return response.data.refresh_token;
     } catch (error) {
-      console.log(error);
       throw new BadRequestException();
     }
   }
 
   async appleTokenValidate(refresh_token, isAndroid?: boolean) {
+    const applePrivateKey = appleConfig.privateKey.replace(/\\n/g, '\n');
     const clientId = isAndroid ? appleConfig.android : appleConfig.client_id;
     const clientSecret = createClientSecret({
       keyId: appleConfig.keyId,
       bundleId: clientId,
       teamId: appleConfig.teamId,
-      privateKey: appleConfig.privateKey,
+      privateKey: applePrivateKey,
     });
 
     const data = new URLSearchParams();
@@ -259,7 +257,6 @@ export class AuthService {
       const id = await this.appleTokenValidate(refresh_token, isAndroid);
       return await this.usersService.createUser('a' + id, email, nickname);
     } catch (error) {
-      console.log(error);
       if (
         error.response.error === 'PRIMARY' ||
         error.response.statusCode === 403
