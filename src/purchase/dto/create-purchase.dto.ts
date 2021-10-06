@@ -19,7 +19,7 @@ export class CreatePurchaseDto {
 
   /**
    * 결제시 발급받는 imp_uid, 전액 포인트 결제인 경우 no 입력
-   * @example imp_297510333741 | no
+   * @example 'imp_297510333741 | no'
    */
   @IsString()
   readonly imp_uid: string;
