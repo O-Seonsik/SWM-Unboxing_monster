@@ -65,7 +65,11 @@ export class PaymentsService {
 
   async checkForgery(data: PaymentsDto, usedPoint: number): Promise<boolean> {
     const { boxes, imp_uid, merchant_uid } = data;
-    const serverData = await this.getPaymentData(imp_uid);
+    let serverData;
+    // imp_uid 가 0이면 전액 포인트 결제 따라서 amount 를 0으로 초기화함
+    if (imp_uid === 'no')
+      serverData = { merchant_uid: merchant_uid, amount: 0 };
+    else serverData = await this.getPaymentData(imp_uid);
     if (serverData.merchant_uid !== merchant_uid)
       throw new BadRequestException(
         'merchant_uid 가 일치하지 않음',
