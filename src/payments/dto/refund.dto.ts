@@ -2,7 +2,7 @@ import { IsNumber, IsString } from 'class-validator';
 
 export class RefundDto {
   /**
-   * 아임포트 결제시 발급받은 uid
+   * "아임포트 결제시 발급받은 uid || 전액 포인트로 구매한 경우 no"
    * @example imp_218715498371
    */
   @IsString()
@@ -15,7 +15,7 @@ export class RefundDto {
   @IsString()
   readonly merchant_uid: string;
   /**
-   * 환불 가능 금액(결제 총액 입력하면 됨)
+   * 환불 가능 금액(포인트를 제외한 결제 총액 입력하면 됨)
    * @example 15000
    */
   @IsNumber()

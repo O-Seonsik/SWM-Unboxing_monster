@@ -233,7 +233,7 @@ export class PurchaseService {
   }
 
   async refundPurchase(data: RefundDto, ownerId: string): Promise<Purchase> {
-    const { merchant_uid } = data;
+    const { imp_uid, merchant_uid } = data;
     try {
       const purchase = await this.prismaService.purchase.findUnique({
         where: { id: merchant_uid },
@@ -257,7 +257,7 @@ export class PurchaseService {
           const userBoxCount = await this.prismaService.boxStorage.findFirst({
             where: { boxId: box.boxId, ownerId: ownerId },
           });
-          if (userBoxCount.count < box.count)
+          if (userBoxCount === null || userBoxCount.count < box.count)
             throw new ConflictException(
               '환불 대상 박스를 이미 사용했습니다.',
               'Conflict Exception',
@@ -265,12 +265,15 @@ export class PurchaseService {
         }),
       );
 
-      const refund = await this.paymentsService.refund(data);
-      if (!refund)
-        throw new BadRequestException(
-          'imp_uid 혹은 checksum이 올바르지 않습니다.',
-          'Bad request exception',
-        );
+      // 전액 포인트결제가 아닐 때만 아임포트 환불
+      if (imp_uid !== 'no') {
+        const refund = await this.paymentsService.refund(data);
+        if (!refund)
+          throw new BadRequestException(
+            'imp_uid 혹은 checksum이 올바르지 않습니다.',
+            'Bad request exception',
+          );
+      }
 
       const purchaseResult = await this.prismaService.purchase.update({
         where: { id: merchant_uid },

@@ -70,7 +70,9 @@ export class PurchaseController {
     description: '존재하지 않는 ipm_uid 혹은, checksum이 올바르지 않은 경우',
   })
   @ApiNotFoundResponse({ description: 'merchant_uid 가 존재하지 않는 경우' })
-  @ApiConflictResponse({ description: '이미 환불된 내역인 경우' })
+  @ApiConflictResponse({
+    description: '이미 환불된 내역인 경우, 이미 환불 대상 박스를 사용한 경우',
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Patch('refund')
