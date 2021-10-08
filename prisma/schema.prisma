@@ -122,6 +122,15 @@ model Coupon {
     isShow      Boolean     @default(true)
 }
 
+model CouponUsedRecord {
+    id          Int         @default(autoincrement())   @id
+    status      Boolean     @default(false)
+    productId   String
+    owner       String
+    usedAt      String
+    phone       String
+}
+
 model BoxStorage {
     id      Int     @default(autoincrement())   @id
     owner   User    @relation(fields: [ownerId], references: [id])

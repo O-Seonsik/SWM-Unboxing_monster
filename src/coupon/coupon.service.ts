@@ -154,6 +154,16 @@ export class CouponService {
         id: coupon.itemId,
       });
 
+      // 쿠폰 사용기록
+      await this.prismaService.couponUsedRecord.create({
+        data: {
+          productId: productId,
+          owner: userId,
+          usedAt: new Date().toString(),
+          phone: phone,
+        },
+      });
+
       // 기프티콘 구매 AWS-Lambda Agent 실행
       config.update(awsConfig);
       const result = await new Lambda()
