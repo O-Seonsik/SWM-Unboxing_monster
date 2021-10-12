@@ -256,7 +256,6 @@ export class BoxService {
       throw error;
     }
   }
-
   generateProbability(
     itemPrices: number[],
     boxPrice: number,
@@ -267,8 +266,10 @@ export class BoxService {
 
     for (let i = 0; i < itemPrices.length; i++) {
       let prob;
-      if (i === itemPrices.length - 1) prob = baseProb;
-      else {
+      if (itemPrices[i] === itemPrices[itemPrices.length - 1]) {
+        prob = baseProb;
+        baseProb -= prob;
+      } else {
         const remain = itemPrices.slice(i + 1);
         const nextBoxPrice =
           alpha * Math.min(remain[0], boxPrice) +
@@ -281,8 +282,8 @@ export class BoxService {
       semiProbabilities.push(prob);
     }
 
-    const counter = {};
-    const prob = {};
+    const counter: { [keys: number]: number } = {};
+    const prob: { [keys: number]: number } = {};
 
     for (let i = 0; i < itemPrices.length; i++) {
       const price = itemPrices[i];
