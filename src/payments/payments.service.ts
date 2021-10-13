@@ -51,13 +51,19 @@ export class PaymentsService {
           '이미 환불된 결제입니다.',
           'Conflict exception',
         );
+
+      if (res.data.response.status === 'failed')
+        throw new NotFoundException(
+          '결제가 완료되지 않았습니다.',
+          'Not found exception',
+        );
+
       return {
         amount: res.data.response.amount,
         merchant_uid: res.data.response.merchant_uid,
       };
     } catch (error) {
-      if (error.status === 401) throw error;
-      else if (error.status === 409) throw error;
+      if (error.status) throw error;
       else
         throw new UnauthorizedException('인증 실패', '토큰값이 올바르지 않음');
     }
@@ -70,6 +76,7 @@ export class PaymentsService {
     if (imp_uid === 'no')
       serverData = { merchant_uid: merchant_uid, amount: 0 };
     else serverData = await this.getPaymentData(imp_uid);
+    console.log(serverData);
     if (serverData.merchant_uid !== merchant_uid)
       throw new BadRequestException(
         'merchant_uid 가 일치하지 않음',
