@@ -11,9 +11,7 @@ export class EventService {
 
   async joinEvent(userId: string): Promise<boolean> {
     try {
-      const eventNumber = await this.prismaService.event.count({
-        where: { eventId: 1 },
-      });
+      const eventNumber = await this.checkJoinEvent();
 
       // 최대 이벤트 참여자 확인
       if (eventNumber > 200)
@@ -70,5 +68,13 @@ export class EventService {
     } catch (error) {
       throw error;
     }
+  }
+
+  async checkJoinEvent(): Promise<number> {
+    return await this.prismaService.event.count({
+      where: {
+        eventId: 1,
+      },
+    });
   }
 }

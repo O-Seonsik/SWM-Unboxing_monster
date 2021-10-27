@@ -22,4 +22,10 @@ export class EventController {
   async joinEvent(@Request() req): Promise<boolean> {
     return await this.eventService.joinEvent(req.user.userId);
   }
+
+  @ApiOperation({ summary: '회원가입 이벤트 참여 현황 확인' })
+  @Get('join/check')
+  async checkJoinEvent(): Promise<number> {
+    return await this.eventService.checkJoinEvent();
+  }
 }
