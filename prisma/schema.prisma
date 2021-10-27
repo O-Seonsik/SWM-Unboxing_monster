@@ -23,6 +23,7 @@ model User {
     Purchase    Purchase[]
     openResult  OpenResult[]
     isManager   Boolean @default(false)
+    event       Event[]
 }
 
 model Point {
@@ -148,4 +149,11 @@ model OpenResult {
     userId  String
     itemId  Int
     openAt  String
+}
+
+model Event {
+    id          Int     @default(autoincrement())   @id
+    eventId     Int
+    owner       User    @relation(fields: [userId], references: [id])
+    userId      String
 }

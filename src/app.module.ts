@@ -13,6 +13,7 @@ import { BoxStorageModule } from './box-storage/box-storage.module';
 import { PaymentsModule } from './payments/payments.module';
 import { OpenResultModule } from './open-result/open-result.module';
 import { PointModule } from './point/point.module';
+import { EventModule } from './event/event.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PointModule } from './point/point.module';
     PaymentsModule,
     OpenResultModule,
     PointModule,
+    EventModule,
   ],
   controllers: [AppController],
   providers: [AppService],
