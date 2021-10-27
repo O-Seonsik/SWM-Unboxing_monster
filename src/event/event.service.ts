@@ -42,8 +42,8 @@ export class EventService {
         },
       });
 
-      // 유저 포인트 증가 표시
-      await this.prismaService.user.update({
+      // 유저 포인트 증가
+      const user = await this.prismaService.user.update({
         where: {
           id: userId,
         },
@@ -53,6 +53,19 @@ export class EventService {
           },
         },
       });
+
+      // 포인트 증가 기록
+      await this.prismaService.point.create({
+        data: {
+          userId: userId,
+          title: '회원가입 이벤트',
+          point: 3000,
+          total: user.point,
+          isAdd: true,
+          time: new Date().toString(),
+        },
+      });
+
       return true;
     } catch (error) {
       throw error;
