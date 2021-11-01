@@ -209,16 +209,13 @@ export class BoxService {
       try {
         const result = (
           await this.httpService
-            .post('http://open.prider.xyz/api/random/choice', reqBody)
+            .post('https://open.unboxing.monster/api/random/choice', reqBody)
             .toPromise()
-        ).data
-          .replace(/[\[\]'\n|\r/]+/g, '')
-          .split(' ')
-          .map((item) => parseInt(item));
+        ).data.result;
 
         // 당첨 기록
         result.map(async (itemId) => {
-          await this.openResultService.createOpenResult(id, userId, itemId);
+          await this.openResultService.createOpenResult(id, userId, +itemId);
         });
 
         // 박스 사용 처리
@@ -239,7 +236,7 @@ export class BoxService {
             try {
               return await this.couponService.createCoupon({
                 ownerId: userId,
-                itemId: item,
+                itemId: +item,
               });
             } catch (error) {
               console.log(error);
