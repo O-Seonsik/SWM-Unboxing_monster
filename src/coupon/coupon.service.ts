@@ -174,8 +174,7 @@ export class CouponService {
               product_id: productId,
               phone_number: phone,
               title: title,
-              // 테스트 모드 활성화
-              test: true,
+              test: false,
             },
             null,
             2,
