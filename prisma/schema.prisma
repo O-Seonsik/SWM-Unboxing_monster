@@ -157,3 +157,10 @@ model Event {
     owner       User    @relation(fields: [userId], references: [id])
     userId      String
 }
+
+model Survey {
+    id          Int         @default(autoincrement())   @id
+    userId      String
+    survey      String      @db.VarChar(5000)
+    writeAt     String
+}
