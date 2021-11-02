@@ -202,7 +202,7 @@ export class BoxService {
       const prob = this.generateProbability(reverseSortedList, openBox.price);
       const kwargs = JSON.stringify({ a: a, p: prob, size: count });
       const reqBody = {
-        request_id: 'test',
+        request_id: 'unboxing_monster',
         kwargs: kwargs,
       };
 
