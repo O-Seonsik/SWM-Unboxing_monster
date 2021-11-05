@@ -260,6 +260,7 @@ export class BoxService {
   ): number[] {
     const semiProbabilities = [];
     let baseProb = 1;
+    boxPrice *= 1.03;
 
     for (let i = 0; i < itemPrices.length; i++) {
       let prob;
