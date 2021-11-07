@@ -1,14 +1,12 @@
-# 공정한 랜덤박스 - Unboxing monster
-***
+# 공정한 랜덤박스 - Unboxing monster(Server)
+공정한 랜덤박스 - Unboxing monster의 서버입니다.
 
 ## About Unboxing monster
-***
 https://unboxing.monster
 ![캡처](./readme-resource/unboxing.png)
 
 
 ## Unboxing monster 설계
-***
 ![캡처](./readme-resource/unboxing-structure.png)
 
 ELB 로 ECS 의 컨테이너 활성화 상태 확인 및 inactive 상태 컨테이너 삭제 및 컨테이너 새로 생성을 가능하게 합니다.
@@ -60,7 +58,6 @@ Prisma 를 활용하여 ORM 으로 데이터베이스를 컨트롤 합니다.
   - 서비스 내에서 진행하는 설문조사 결과를 저장하기 위해 존재하는 테이블
 
 ## API I/F 정의서
-***
 ![캡처](./readme-resource/unboxing-swagger.png)
 https://api.unboxing.monster/docs
 
