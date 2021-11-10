@@ -207,15 +207,24 @@ export class BoxService {
       };
 
       try {
-        const result = (
+        const data = (
           await this.httpService
             .post('https://open.unboxing.monster/api/random/choice', reqBody)
             .toPromise()
-        ).data.result;
+        ).data;
+
+        const result = data.result;
 
         // 당첨 기록
         result.map(async (itemId) => {
-          await this.openResultService.createOpenResult(id, userId, +itemId);
+          await this.openResultService.createOpenResult(
+            id,
+            userId,
+            +itemId,
+            data.block_hash,
+            data.seed,
+            data.tx_hash,
+          );
         });
 
         // 박스 사용 처리

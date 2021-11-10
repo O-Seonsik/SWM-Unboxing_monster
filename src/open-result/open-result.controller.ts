@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { OpenResultService } from './open-result.service';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiNotFoundResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OpenResultDto } from './dto/open-result.dto';
 
 @ApiTags('open-results')
@@ -24,5 +24,12 @@ export class OpenResultController {
   @Get('/distribution/:id')
   async test(@Param('id') id: number) {
     return await this.openResultService.getOpenDistribution(id);
+  }
+
+  @ApiOperation({ summary: '닉네임으로 사용자의 오픈 결과 가져오기' })
+  @ApiNotFoundResponse({ description: '일치하는 닉네임이 존재하지 않는 경우' })
+  @Get('/nickname/:nickname')
+  async getOpenResultByNickname(@Param('nickname') nickname: string) {
+    return await this.openResultService.getOpenResultByNickname(nickname);
   }
 }

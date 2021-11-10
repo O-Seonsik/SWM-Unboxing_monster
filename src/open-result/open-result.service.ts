@@ -52,6 +52,9 @@ export class OpenResultService {
     boxId: number,
     userId: string,
     itemId: number,
+    block_hash: string,
+    seed: number,
+    tx_hsah: string,
   ): Promise<OpenResult> {
     try {
       return await this.prismaService.openResult.create({
@@ -60,6 +63,9 @@ export class OpenResultService {
           userId: userId,
           itemId: itemId,
           openAt: new Date().toString(),
+          block_hash: block_hash,
+          seed: seed,
+          tx_hash: tx_hsah,
         },
       });
     } catch (error) {
@@ -68,6 +74,25 @@ export class OpenResultService {
           "The box or user or item doesn't exist in our service",
         );
       return error;
+    }
+  }
+
+  async getOpenResultByNickname(nickname: string): Promise<OpenResult[]> {
+    try {
+      const user = await this.prismaService.user.findUnique({
+        where: { nickname: nickname },
+      });
+
+      if (user === null)
+        throw new NotFoundException(
+          '사용자 아이디 찾을 수 없음',
+          'Not found exception',
+        );
+      return await this.prismaService.openResult.findMany({
+        where: { userId: user.id },
+      });
+    } catch (error) {
+      throw error;
     }
   }
 }
