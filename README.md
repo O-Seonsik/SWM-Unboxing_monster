@@ -1,9 +1,13 @@
 # 공정한 랜덤박스 - Unboxing monster(Server)
 공정한 랜덤박스 - Unboxing monster의 서버입니다.
 
-## About Unboxing monster
-https://unboxing.monster
-![캡처](./readme-resource/unboxing.png)
+## 사용 기술
+Server - Nest.js
+Database - Mysql(AWS-RDS)
+ORM - Prisma
+
+## 시연 영상
+[![시연영상](https://img.youtube.com/vi/MBVXpolEiW0/0.jpg)](https://youtu.be/MBVXpolEiW0)
 
 
 ## Unboxing monster 설계
