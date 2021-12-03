@@ -2,9 +2,9 @@
 공정한 랜덤박스 - Unboxing monster의 서버입니다.
 
 ## 사용 기술
-Server - Nest.js
-Database - Mysql(AWS-RDS)
-ORM - Prisma
+- Server - Nest.js
+- Database - Mysql(AWS-RDS)
+- ORM - Prisma
 
 ## 시연 영상
 [![시연영상](https://img.youtube.com/vi/MBVXpolEiW0/0.jpg)](https://youtu.be/MBVXpolEiW0)
